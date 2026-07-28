@@ -1,0 +1,10 @@
+spring:
+  cloud:
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+
+logging:
+  level:
+    root: WARN
+    com.aqvp: INFO

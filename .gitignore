@@ -1,0 +1,22 @@
+target/
+!.mvn/wrapper/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+.idea/
+*.ipr
+*.iws
+.vscode/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+.env
+*.log
+*.tmp
+nbproject/
+
+# OS files
+*.db

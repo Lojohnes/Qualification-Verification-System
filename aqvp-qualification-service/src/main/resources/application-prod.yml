@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: ${QUALIFICATION_DB_URL}
+    username: ${QUALIFICATION_DB_USERNAME}
+    password: ${QUALIFICATION_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+logging:
+  level:
+    root: WARN
+    com.aqvp: INFO
