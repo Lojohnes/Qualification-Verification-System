@@ -1,0 +1,246 @@
+{
+  "info": {
+    "name": "AQVP Identity Service",
+    "description": "Postman collection for the AQVP Identity & Access module REST endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "{{access_token}}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "description": "Login, logout, refresh and password operations.",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/api/v1/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"admin\",\n  \"password\": \"Admin123!\"\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/api/v1/auth/refresh",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/api/v1/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refresh_token}}\"\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "url": "{{baseUrl}}/api/v1/auth/change-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Admin123!\",\n  \"newPassword\": \"NewPass123!\",\n  \"confirmPassword\": \"NewPass123!\"\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/api/v1/auth/forgot-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@aqvp.local\"\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/api/v1/auth/reset-password",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"reset-token-value\",\n  \"newPassword\": \"NewPass123!\",\n  \"confirmPassword\": \"NewPass123!\"\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "description": "User management endpoints.",
+      "item": [
+        {
+          "name": "List Users",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/api/v1/users"
+          },
+          "response": []
+        },
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "url": "{{baseUrl}}/api/v1/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"johndoe\",\n  \"email\": \"john@aqvp.local\",\n  \"password\": \"Password123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"roleIds\": [\"{{role_user_id}}\"]\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "url": "{{baseUrl}}/api/v1/users/{{user_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.updated@aqvp.local\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Updated\",\n  \"enabled\": true,\n  \"roleIds\": [\"{{role_user_id}}\"]\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/api/v1/users/{{user_id}}"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "description": "Role management endpoints.",
+      "item": [
+        {
+          "name": "List Roles",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/api/v1/roles"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Role",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/api/v1/roles/{{role_id}}"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Role",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "url": "{{baseUrl}}/api/v1/roles",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"VERIFIER\",\n  \"description\": \"Can read user data\",\n  \"permissionIds\": [\"{{permission_user_read_id}}\"]\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"}
+            ],
+            "url": "{{baseUrl}}/api/v1/roles/{{role_id}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"VERIFIER\",\n  \"description\": \"Updated description\",\n  \"permissionIds\": [\"{{permission_user_read_id}}\"]\n}",
+              "options": {"raw": {"language": "json"}}
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Permissions",
+      "description": "Permission query endpoints.",
+      "item": [
+        {
+          "name": "List Permissions",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/api/v1/permissions"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

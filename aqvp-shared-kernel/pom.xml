@@ -13,6 +13,10 @@
     <name>AQVP :: Shared Kernel</name>
     <description>Cross-cutting DDD primitives, events, exceptions, and utilities</description>
 
+    <properties>
+        <maven.compiler.release>17</maven.compiler.release>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
