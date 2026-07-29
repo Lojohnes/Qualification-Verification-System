@@ -1,0 +1,122 @@
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Typography,
+  Box,
+  useTheme,
+} from '@mui/material';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import ShieldIcon from '@mui/icons-material/Shield';
+import BusinessIcon from '@mui/icons-material/Business';
+import SchoolIcon from '@mui/icons-material/School';
+import VerifiedIcon from '@mui/icons-material/Verified';
+import DescriptionIcon from '@mui/icons-material/Description';
+import HistoryIcon from '@mui/icons-material/History';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { useNavigate, useLocation } from 'react-router-dom';
+
+import { ROUTES } from '@/constants/routes';
+
+const DRAWER_WIDTH = 260;
+
+interface SidebarProps {
+  open: boolean;
+  onClose: () => void;
+}
+
+interface MenuItemConfig {
+  label: string;
+  path: string;
+  icon: React.ReactNode;
+  indent?: boolean;
+}
+
+const menuItems: MenuItemConfig[] = [
+  { label: 'Dashboard', path: ROUTES.DASHBOARD, icon: <DashboardIcon /> },
+  { label: 'Identity', path: '#', icon: <ShieldIcon /> },
+  { label: 'Users', path: ROUTES.USERS, icon: <ShieldIcon />, indent: true },
+  { label: 'Roles', path: ROUTES.ROLES, icon: <ShieldIcon />, indent: true },
+  { label: 'Permissions', path: ROUTES.PERMISSIONS, icon: <ShieldIcon />, indent: true },
+  { label: 'Institution', path: ROUTES.INSTITUTION, icon: <BusinessIcon /> },
+  { label: 'Qualification', path: ROUTES.QUALIFICATION, icon: <SchoolIcon /> },
+  { label: 'Verification', path: ROUTES.VERIFICATION, icon: <VerifiedIcon /> },
+  { label: 'Documents', path: ROUTES.DOCUMENTS, icon: <DescriptionIcon /> },
+  { label: 'Audit', path: ROUTES.AUDIT, icon: <HistoryIcon /> },
+  { label: 'Reports', path: ROUTES.REPORTS, icon: <BarChartIcon /> },
+  { label: 'Settings', path: ROUTES.SETTINGS, icon: <SettingsIcon /> },
+];
+
+export function Sidebar({ open, onClose }: SidebarProps) {
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleClick = (path: string) => {
+    if (path !== '#') {
+      navigate(path);
+    }
+    onClose();
+  };
+
+  const drawerContent = (
+    <Box>
+      <Toolbar sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Typography variant="h6" fontWeight={600} color="primary">
+          AQVP
+        </Typography>
+      </Toolbar>
+      <List>
+        {menuItems.map((item) => {
+          const isActive =
+            location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
+          const isHeader = item.path === '#';
+          return (
+            <ListItem key={item.label} disablePadding sx={{ pl: item.indent ? 3 : 0 }}>
+              <ListItemButton
+                selected={!isHeader && isActive}
+                onClick={() => handleClick(item.path)}
+                disabled={isHeader}
+              >
+                {!isHeader && <ListItemIcon>{item.icon}</ListItemIcon>}
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
+      </List>
+    </Box>
+  );
+
+  return (
+    <>
+      <Drawer
+        variant="temporary"
+        open={open}
+        onClose={onClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', md: 'none' },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', md: 'block' },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: DRAWER_WIDTH },
+        }}
+        open
+      >
+        <Box sx={{ height: '100%', bgcolor: theme.palette.background.paper }}>{drawerContent}</Box>
+      </Drawer>
+    </>
+  );
+}
