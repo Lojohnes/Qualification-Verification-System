@@ -20,3 +20,17 @@ nbproject/
 
 # OS files
 *.db
+
+# Frontend / Node.js
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Frontend environment files
+frontend/aqvp-web/.env
+frontend/aqvp-web/.env.local
+frontend/aqvp-web/.env.development.local
+frontend/aqvp-web/.env.test.local
+frontend/aqvp-web/.env.production.local
