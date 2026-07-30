@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/identity_db
-    username: aqvp
-    password: aqvp
+    url: ${IDENTITY_DB_URL:jdbc:postgresql://localhost:5432/identity_db}
+    username: ${IDENTITY_DB_USERNAME:aqvp}
+    password: ${IDENTITY_DB_PASSWORD:aqvp}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
