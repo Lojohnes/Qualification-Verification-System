@@ -21,6 +21,11 @@ nbproject/
 # OS files
 *.db
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
 # Frontend / Node.js
 node_modules/
 dist/

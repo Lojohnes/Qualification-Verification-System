@@ -18,7 +18,7 @@ This guide helps every new developer get the AQVP project running locally, under
 Before you start, install the following tools:
 
 - **Git** — `https://git-scm.com/downloads`
-- **Java 21** — JDK from Oracle, Eclipse Temurin, or Microsoft Build of OpenJDK
+- **Java 17** — JDK from Oracle, Eclipse Temurin, or Microsoft Build of OpenJDK
 - **Maven 3.9+** — `https://maven.apache.org/download.cgi`
 - **IntelliJ IDEA** (recommended) or **VS Code**
 - **PostgreSQL 15+** (optional for local H2 development)
@@ -32,7 +32,7 @@ java -version
 mvn -version
 ```
 
-You should see Java 21 and Maven 3.9 or newer.
+You should see Java 17 and Maven 3.9 or newer.
 
 ---
 
@@ -95,8 +95,8 @@ Examples:
 3. Navigate to `C:\Users\<YourName>\Qualification-Verification-System` and open the root `pom.xml`.
 4. Choose **Open as Project**.
 5. Wait for Maven to import modules.
-6. Set the Project SDK to Java 21:
-   - **File > Project Structure > Project SDK > Add SDK > Download or select JDK 21**.
+6. Set the Project SDK to Java 17:
+   - **File > Project Structure > Project SDK > Add SDK > Download or select JDK 17**.
 7. Enable annotation processing:
    - **Settings > Build, Execution, Deployment > Compiler > Annotation Processors > Enable annotation processing**.
 
@@ -106,19 +106,19 @@ Examples:
 2. Select **File > Open Folder** and choose `C:\Users\<YourName>\Qualification-Verification-System`.
 3. Install the **Extension Pack for Java** and **Spring Boot Extension Pack**.
 4. Wait for Maven to import the project.
-5. Verify the Java version in **Settings > Java > JRE Home** points to JDK 21.
+5. Verify the Java version in **Settings > Java > JRE Home** points to JDK 17.
 
 ---
 
-## 7. Configure Java 21
+## 7. Configure Java 17
 
 ### Windows
 
-1. Install JDK 21.
+1. Install JDK 17.
 2. Set `JAVA_HOME`:
 
 ```powershell
-[System.Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-21", "User")
+[System.Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Microsoft\jdk-17.0.19.10-hotspot", "User")
 ```
 
 3. Add `%JAVA_HOME%\bin` to your `Path` environment variable.
@@ -138,10 +138,10 @@ If you use multiple JDKs, add this to `~/.m2/toolchains.xml`:
   <toolchain>
     <type>jdk</type>
     <provides>
-      <version>21</version>
+      <version>17</version>
     </provides>
     <configuration>
-      <jdkHome>C:\Program Files\Java\jdk-21</jdkHome>
+      <jdkHome>C:\Program Files\Microsoft\jdk-17.0.19.10-hotspot</jdkHome>
     </configuration>
   </toolchain>
 </toolchains>
@@ -149,13 +149,71 @@ If you use multiple JDKs, add this to `~/.m2/toolchains.xml`:
 
 ---
 
-## 8. Configure PostgreSQL and Environment Variables
+## 8. Environment Configuration
 
-### 8.1 Option A: Use the Local H2 Profile (Recommended for Quick Start)
+The project uses `.env.example` files as safe templates. These files contain only example values and can be committed to Git. Real credentials and secrets must stay in local `.env` files, which are ignored by Git.
 
-No PostgreSQL installation is required. The `local-h2` Maven profile and `application-local.yml` start the service with an in-memory H2 database.
+### 8.1 Copy the example files
 
-### 8.2 Option B: Use PostgreSQL
+**Frontend:**
+
+```powershell
+copy frontend\aqvp-web\.env.example frontend\aqvp-web\.env
+```
+
+**Backend:**
+
+```powershell
+copy backend\.env.example backend\.env
+```
+
+On Linux/macOS use `cp` instead of `copy`:
+
+```bash
+cp frontend/aqvp-web/.env.example frontend/aqvp-web/.env
+cp backend/.env.example backend/.env
+```
+
+### 8.2 Replace CHANGE_ME placeholders
+
+Open each `.env` file and replace every `CHANGE_ME` value with a local development value. At minimum:
+
+- `VITE_API_BASE_URL` — the backend API base URL (default `http://localhost:8081` is usually fine)
+- `JWT_SECRET` — a long random string, at least 32 characters
+- `IDENTITY_DB_PASSWORD`, `ADMIN_DB_PASSWORD`, `QUALIFICATION_DB_PASSWORD`, `VERIFICATION_DB_PASSWORD`
+
+### 8.3 Load backend environment variables
+
+Spring Boot does not read `.env` files automatically. Load them with your shell before starting services.
+
+**Windows PowerShell:**
+
+```powershell
+Get-Content backend/.env | ForEach-Object {
+  if ($_ -match '^([^#][^=]*)=(.*)$') {
+    [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
+  }
+}
+```
+
+**Generic terminal (bash/zsh with dotenv support):**
+
+```bash
+set -a
+source backend/.env
+set +a
+```
+
+### 8.4 Option A: Use the Local H2 Profile (Recommended for Quick Start)
+
+No PostgreSQL installation is required. The `local-h2` Maven profile and `application-local.yml` start the Identity service with an in-memory H2 database.
+
+```powershell
+mvn -f aqvp-identity-service/pom.xml -Plocal-h2 spring-boot:run `
+  '-Dspring-boot.run.arguments=--spring.profiles.active=local'
+```
+
+### 8.5 Option B: Use PostgreSQL
 
 1. Install PostgreSQL or use Docker:
 
@@ -163,15 +221,20 @@ No PostgreSQL installation is required. The `local-h2` Maven profile and `applic
 docker run --name aqvp-postgres -e POSTGRES_USER=aqvp -e POSTGRES_PASSWORD=aqvp -e POSTGRES_DB=identity_db -p 5432:5432 -d postgres:15
 ```
 
-2. Create databases for each module as needed.
-3. Set environment variables in your terminal or IDE run configuration:
+2. Create databases for each module as needed (`identity_db`, `admin_db`, `qualification_db`, `verification_db`).
+3. Load the backend `.env` file (see 8.3).
+4. Start a service with the `dev` profile:
 
 ```powershell
-$env:SPRING_DATASOURCE_URL="jdbc:postgresql://localhost:5432/identity_db"
-$env:SPRING_DATASOURCE_USERNAME="aqvp"
-$env:SPRING_DATASOURCE_PASSWORD="aqvp"
-$env:JWT_SECRET="change-me-very-long-secret-key-at-least-256-bits"
+mvn -f aqvp-identity-service/pom.xml spring-boot:run `
+  '-Dspring-boot.run.arguments=--spring.profiles.active=dev'
 ```
+
+### 8.6 Security rules
+
+- **Never commit `.env` files.** They are ignored by `.gitignore`.
+- **Never commit passwords, secrets, API keys, tokens, private keys, or certificates.** If you accidentally commit one, rotate it immediately.
+- Use `git status` to confirm only `.env.example` files are staged, not `.env` files.
 
 ---
 
