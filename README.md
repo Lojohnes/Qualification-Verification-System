@@ -51,6 +51,6 @@ Enterprise foundation for the Academic Qualification Verification Platform.
 - **SpotBugs**: `mvn -P static-analysis spotbugs:check`
 - **JaCoCo**: coverage reports generated under `target/site/jacoco`
 
-## GitHub Actions
+## GitHub Actions. 
 
 The `.github/workflows/ci.yml` pipeline builds, runs static analysis and collects coverage on every push or pull request to `main` and `develop`.
