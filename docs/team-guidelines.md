@@ -9,7 +9,8 @@ Last updated: 2026-07-29
 
 ## 1. Purpose
 
-This document defines how the AQVP delivery team collaborates, plans, develops, integrates, tests, and releases software. It is the working agreement for the team and the reference for onboarding, sprint ceremonies, code reviews, and release management.
+This document defines how the AQVP delivery team collaborates, plans, develops, integrates, tests, and releases software. 
+It is the working agreement for the team and the reference for onboarding, sprint ceremonies, code reviews, and release management.
 
 These guidelines apply to all team members, contractors, and AI assistants contributing to the codebase.
 
@@ -54,7 +55,7 @@ Sprint 1 — the **Identity & Access Module** — has been completed, fully test
 
 ### 3.4 Wonder Mangwendeza — Backend Developer
 
-- Verification Engine
+- Verification Engine (AQVP)
 - Verification Requests
 - Consent Validation
 - QR Verification
@@ -340,7 +341,7 @@ Semantic Versioning: `MAJOR.MINOR.PATCH`
 - `README.md` — project overview and setup
 - `docs/adr/` — architecture decision records
 - `aqvp-identity-service/src/test/resources/testing/report/identity-testing-report.md` — Sprint 1 test report
-- Swagger UI (local): `http://localhost:8081/swagger-ui.html`
+- The Swagger UI (local): `http://localhost:8081/swagger-ui.html`
 
 ---
 
