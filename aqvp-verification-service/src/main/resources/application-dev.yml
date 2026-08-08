@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/verification_db
-    username: aqvp
-    password: aqvp
+    url: ${VERIFICATION_DB_URL:jdbc:postgresql://localhost:5432/verification_db}
+    username: ${VERIFICATION_DB_USERNAME:aqvp}
+    password: ${VERIFICATION_DB_PASSWORD:aqvp}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

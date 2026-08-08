@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+    <!-- JPA entity relationship collections are managed by the JPA provider and Lombok builders -->
+    <Match>
+        <Package name="~com\.aqvp\.platform\.identity\.domain.*"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Package name="~com\.aqvp\.platform\.identity\.domain.*"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Spring constructor injection intentionally stores dependencies in final fields -->
+    <Match>
+        <Package name="~com\.aqvp\.platform\.identity\.(config|controller|service|security).*"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Package name="~com\.aqvp\.platform\.identity\.(config|controller|service|security).*"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- MapStruct generated mapper implementations are not under our direct control -->
+    <Match>
+        <Class name="~.*MapperImpl"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+
+</FindBugsFilter>

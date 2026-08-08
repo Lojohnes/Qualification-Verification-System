@@ -1,0 +1,72 @@
+# ==============================================================================
+# AQVP (Academic Qualification Verification Platform) - Project Requirements
+# ==============================================================================
+# Note: This repository is a Java (Spring Boot) multi-module backend and 
+# React/TypeScript frontend. Below are the system, runtime, build, and 
+# package requirements derived from the `develop` branch.
+# ==============================================================================
+
+# 1. System & Runtime Prerequisites
+# ------------------------------------------------------------------------------
+# Java Development Kit (JDK) 21 LTS (or JDK 17+ with source release 21)
+# Apache Maven 3.9+
+# Node.js 20 LTS (or Node.js 18+)
+# npm 10+
+# Docker Engine 24+ & Docker Compose v2+
+# PostgreSQL 15+ (for dev/prod database; H2 in-memory available for local dev)
+
+# 2. Backend Modules & Core Tech Stack (Maven pom.xml)
+# ------------------------------------------------------------------------------
+# - Java: 21
+# - Spring Boot: 3.3.4
+# - Spring Cloud: 2023.0.3
+# - Spring Security & JWT (io.jsonwebtoken:jjwt:0.12.6)
+# - Spring Data JPA & Hibernate
+# - Database Migrations: Flyway (org.flywaydb:flyway-core)
+# - OpenAPI / Swagger Documentation: SpringDoc (springdoc-openapi-starter-webmvc-ui:2.6.0)
+# - Object Mapping: MapStruct (1.5.5.Final) & Lombok (1.18.34)
+# - Code Quality: Checkstyle (10.17.0), SpotBugs (4.8.6.2), JaCoCo (0.8.12)
+# - Testing: JUnit 5, Mockito, AssertJ, Testcontainers (1.20.1)
+
+# Backend Modules:
+# - aqvp-shared-kernel
+# - aqvp-identity-service
+# - aqvp-qualification-service
+# - aqvp-verification-service
+# - aqvp-admin-service
+# - aqvp-api-gateway
+
+# 3. Frontend Dependencies (frontend/aqvp-web/package.json)
+# ------------------------------------------------------------------------------
+# Framework & Core:
+# - react >= 19.0.0
+# - react-dom >= 19.0.0
+# - react-router-dom >= 7.4.0
+# - typescript ~ 5.7.0
+# - vite >= 6.2.0
+
+# UI & State Management:
+# - @mui/material >= 6.4.0
+# - @mui/icons-material >= 6.4.0
+# - @emotion/react >= 11.14.0
+# - @emotion/styled >= 11.14.0
+# - @reduxjs/toolkit >= 2.6.0
+# - react-redux >= 9.2.0
+
+# Forms, Validation & HTTP:
+# - react-hook-form >= 7.55.0
+# - @hookform/resolvers >= 4.1.0
+# - yup >= 1.6.1
+# - axios >= 1.8.0
+
+# Visuals & Icons:
+# - chart.js >= 4.4.8
+# - react-chartjs-2 >= 5.3.0
+# - react-icons >= 5.5.0
+
+# 4. Optional Python Utility & Testing Tools (if running automation scripts)
+# ------------------------------------------------------------------------------
+requests>=2.31.0
+pytest>=8.0.0
+pydantic>=2.0.0
+python-dotenv>=1.0.0

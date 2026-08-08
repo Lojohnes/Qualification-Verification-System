@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  identity-db:
+    image: postgres:16-alpine
+    container_name: aqvp-identity-db-test
+    environment:
+      POSTGRES_DB: identity_test
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d identity_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - identity-test
+
+  identity-service:
+    build:
+      context: ../../..
+      dockerfile: aqvp-identity-service/Dockerfile
+    container_name: aqvp-identity-service-test
+    depends_on:
+      identity-db:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://identity-db:5432/identity_test
+      SPRING_DATASOURCE_USERNAME: test
+      SPRING_DATASOURCE_PASSWORD: test
+      JWT_SECRET: change-me-very-long-secret-key-at-least-256-bits
+    ports:
+      - "8081:8081"
+    networks:
+      - identity-test
+
+networks:
+  identity-test:
+    driver: bridge
