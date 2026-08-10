@@ -54,3 +54,12 @@ Enterprise foundation for the Academic Qualification Verification Platform.
 ## GitHub Actions
 
 The `.github/workflows/ci.yml` pipeline builds, runs static analysis and collects coverage on every push or pull request to `main` and `develop`.
+
+## Documentation
+
+Project documentation is now split into two persistent groups:
+
+- `docs/memory/` preserves project context, current state, decisions, test results, open work, and session handoff notes.
+- `docs/reference/` contains the authoritative technical reference library for architecture, domain, business rules, APIs, database, development, testing, security, deployment, quick reference, glossary, and training.
+
+Historical source documents from the earlier docs layout are preserved under `docs/reference/legacy/`.
