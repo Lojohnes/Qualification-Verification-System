@@ -8,7 +8,7 @@ Enterprise foundation for the Academic Qualification Verification Platform.
 - Spring Boot 3.x
 - Maven 3.9+
 - PostgreSQL 16
-- Keycloak 24
+- Redis 7
 - Apache Kafka 3.6
 
 ## Module Structure
@@ -24,19 +24,27 @@ Enterprise foundation for the Academic Qualification Verification Platform.
 
 ## Quick Start
 
-1. Start infrastructure:
-   ```bash
-   docker compose up -d
+1. Copy the environment template and set a local JWT secret:
+   ```powershell
+   copy .env.example .env
    ```
-2. Create application databases in PostgreSQL (one per service).
-3. Build the project:
-   ```bash
-   mvn -B clean verify
+   Edit `.env` if you need to change host ports (the default PostgreSQL host port is `5433` to avoid conflicts with a local PostgreSQL installation).
+2. Start infrastructure:
+   ```powershell
+   docker compose -f docker/docker-compose.dev.yml --env-file .env up -d
    ```
-4. Run a service with a specific profile:
-   ```bash
+3. Verify all containers are healthy:
+   ```powershell
+   docker compose -f docker/docker-compose.dev.yml --env-file .env ps
+   ```
+4. Build the project:
+   ```powershell
+   mvn -B clean verify -DskipTests
+   ```
+5. Run a service with the dev profile (after loading `.env` variables in your shell):
+   ```powershell
    cd aqvp-identity-service
-   mvn spring-boot:run -Dspring-boot.run.profiles=dev
+   mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
    ```
 
 ## Profiles

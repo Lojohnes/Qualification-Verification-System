@@ -1,10 +1,10 @@
-package com.aqvp.gateway;
+package com.aqvp.platform.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Bootstrap for the API Gateway.
+ * Bootstrap for the Gateway service.
  */
 @SpringBootApplication
 public class GatewayApplication {
@@ -13,3 +13,4 @@ public class GatewayApplication {
         SpringApplication.run(GatewayApplication.class, args);
     }
 }
+

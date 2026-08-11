@@ -45,8 +45,8 @@ WHERE r.name = 'ADMIN'
 
 INSERT INTO roles_permissions (role_id, permission_id)
 SELECT r.id, p.id
-FROM all_roles r
-JOIN all_permissions p ON p.name = 'user:read'
+FROM roles r
+JOIN permissions p ON p.name = 'user:read'
 WHERE r.name = 'USER'
   AND NOT EXISTS (
       SELECT 1 FROM roles_permissions rp WHERE rp.role_id = r.id AND rp.permission_id = p.id
