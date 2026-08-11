@@ -18,7 +18,7 @@ This guide helps every new developer get the AQVP project running locally, under
 Before you start, install the following tools:
 
 - **Git** — `https://git-scm.com/downloads`
-- **Java 17** — JDK from Oracle, Eclipse Temurin, or Microsoft Build of OpenJDK
+- **Java 21** — JDK from Oracle, Eclipse Temurin, or Microsoft Build of OpenJDK
 - **Maven 3.9+** — `https://maven.apache.org/download.cgi`
 - **IntelliJ IDEA** (recommended) or **VS Code**
 - **PostgreSQL 15+** (optional for local H2 development)
@@ -32,7 +32,7 @@ java -version
 mvn -version
 ```
 
-You should see Java 17 and Maven 3.9 or newer.
+You should see Java 21 and Maven 3.9 or newer.
 
 ---
 
@@ -95,8 +95,8 @@ Examples:
 3. Navigate to `C:\Users\<YourName>\Qualification-Verification-System` and open the root `pom.xml`.
 4. Choose **Open as Project**.
 5. Wait for Maven to import modules.
-6. Set the Project SDK to Java 17:
-   - **File > Project Structure > Project SDK > Add SDK > Download or select JDK 17**.
+6. Set the Project SDK to Java 21:
+   - **File > Project Structure > Project SDK > Add SDK > Download or select JDK 21**.
 7. Enable annotation processing:
    - **Settings > Build, Execution, Deployment > Compiler > Annotation Processors > Enable annotation processing**.
 
@@ -106,19 +106,19 @@ Examples:
 2. Select **File > Open Folder** and choose `C:\Users\<YourName>\Qualification-Verification-System`.
 3. Install the **Extension Pack for Java** and **Spring Boot Extension Pack**.
 4. Wait for Maven to import the project.
-5. Verify the Java version in **Settings > Java > JRE Home** points to JDK 17.
+5. Verify the Java version in **Settings > Java > JRE Home** points to JDK 21.
 
 ---
 
-## 7. Configure Java 17
+## 7. Configure Java 21
 
 ### Windows
 
-1. Install JDK 17.
+1. Install JDK 21.
 2. Set `JAVA_HOME`:
 
 ```powershell
-[System.Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Microsoft\jdk-17.0.19.10-hotspot", "User")
+[System.Environment]::SetEnvironmentVariable("JAVA_HOME", "C:\Program Files\Java\jdk-21", "User")
 ```
 
 3. Add `%JAVA_HOME%\bin` to your `Path` environment variable.
@@ -138,10 +138,10 @@ If you use multiple JDKs, add this to `~/.m2/toolchains.xml`:
   <toolchain>
     <type>jdk</type>
     <provides>
-      <version>17</version>
+      <version>21</version>
     </provides>
     <configuration>
-      <jdkHome>C:\Program Files\Microsoft\jdk-17.0.19.10-hotspot</jdkHome>
+      <jdkHome>C:\Program Files\Java\jdk-21</jdkHome>
     </configuration>
   </toolchain>
 </toolchains>
@@ -149,92 +149,138 @@ If you use multiple JDKs, add this to `~/.m2/toolchains.xml`:
 
 ---
 
-## 8. Environment Configuration
+## 8. Local Infrastructure Setup
 
-The project uses `.env.example` files as safe templates. These files contain only example values and can be committed to Git. Real credentials and secrets must stay in local `.env` files, which are ignored by Git.
+AQVP uses Docker Compose to provide PostgreSQL, Redis, and Kafka for local development. The full infrastructure reference is in `docs/local-development-infrastructure.md`.
 
-### 8.1 Copy the example files
+### 8.1 Copy the environment example
 
-**Frontend:**
-
-```powershell
-copy frontend\aqvp-web\.env.example frontend\aqvp-web\.env
-```
-
-**Backend:**
+From the repository root:
 
 ```powershell
-copy backend\.env.example backend\.env
+copy .env.example .env
 ```
 
-On Linux/macOS use `cp` instead of `copy`:
+On Linux/macOS:
 
 ```bash
-cp frontend/aqvp-web/.env.example frontend/aqvp-web/.env
-cp backend/.env.example backend/.env
+cp .env.example .env
 ```
 
-### 8.2 Replace CHANGE_ME placeholders
+Edit `.env` and replace `JWT_SECRET=CHANGE_ME` with a long random string (at least 32 characters). Leave the other development defaults as they are for local work.
 
-Open each `.env` file and replace every `CHANGE_ME` value with a local development value. At minimum:
+### 8.2 Start Docker Desktop
 
-- `VITE_API_BASE_URL` — the backend API base URL (default `http://localhost:8081` is usually fine)
-- `JWT_SECRET` — a long random string, at least 32 characters
-- `IDENTITY_DB_PASSWORD`, `ADMIN_DB_PASSWORD`, `QUALIFICATION_DB_PASSWORD`, `VERIFICATION_DB_PASSWORD`
+Make sure Docker Desktop (or Docker Engine on Linux) is running.
 
-### 8.3 Load backend environment variables
-
-Spring Boot does not read `.env` files automatically. Load them with your shell before starting services.
-
-**Windows PowerShell:**
+### 8.3 Start PostgreSQL, Redis, and Kafka
 
 ```powershell
-Get-Content backend/.env | ForEach-Object {
+docker compose -f docker/docker-compose.dev.yml --env-file .env up -d
+```
+
+Wait until all containers report `healthy`:
+
+```powershell
+docker compose -f docker/docker-compose.dev.yml --env-file .env ps
+```
+
+### 8.4 Verify container health
+
+PostgreSQL:
+
+```powershell
+docker exec -e PGPASSWORD=$env:DATABASE_PASSWORD aqvp-postgres psql -U aqvp -d aqvp_db -c "SELECT 1;"
+```
+
+Redis:
+
+```powershell
+docker exec -it aqvp-redis redis-cli ping
+```
+
+Kafka:
+
+```powershell
+docker exec -it aqvp-kafka kafka-broker-api-versions --bootstrap-server localhost:19092
+```
+
+### 8.5 Load environment variables
+
+PowerShell does not read `.env` files automatically. Before starting a service, clear any stale shell variables and reload the file:
+
+```powershell
+foreach ($v in 'DATABASE_URL','DATABASE_USERNAME','DATABASE_PASSWORD','DATABASE_NAME','DATABASE_PORT','REDIS_HOST','REDIS_PORT','KAFKA_BOOTSTRAP_SERVERS','KAFKA_HOST','KAFKA_PORT','JWT_SECRET') {
+  [System.Environment]::SetEnvironmentVariable($v, $null, 'Process')
+}
+Get-Content .env | ForEach-Object {
   if ($_ -match '^([^#][^=]*)=(.*)$') {
     [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
   }
 }
 ```
 
-**Generic terminal (bash/zsh with dotenv support):**
+On Linux/macOS:
 
 ```bash
 set -a
-source backend/.env
+source .env
 set +a
 ```
 
-### 8.4 Option A: Use the Local H2 Profile (Recommended for Quick Start)
+### 8.6 Start the backend
 
-No PostgreSQL installation is required. The `local-h2` Maven profile and `application-local.yml` start the Identity service with an in-memory H2 database.
-
-```powershell
-mvn -f aqvp-identity-service/pom.xml -Plocal-h2 spring-boot:run `
-  '-Dspring-boot.run.arguments=--spring.profiles.active=local'
-```
-
-### 8.5 Option B: Use PostgreSQL
-
-1. Install PostgreSQL or use Docker:
-
-```powershell
-docker run --name aqvp-postgres -e POSTGRES_USER=aqvp -e POSTGRES_PASSWORD=aqvp -e POSTGRES_DB=identity_db -p 5432:5432 -d postgres:15
-```
-
-2. Create databases for each module as needed (`identity_db`, `admin_db`, `qualification_db`, `verification_db`).
-3. Load the backend `.env` file (see 8.3).
-4. Start a service with the `dev` profile:
+With infrastructure running and environment variables loaded, start the Identity service:
 
 ```powershell
 mvn -f aqvp-identity-service/pom.xml spring-boot:run `
   '-Dspring-boot.run.arguments=--spring.profiles.active=dev'
 ```
 
-### 8.6 Security rules
+### 8.7 Start the frontend
+
+```powershell
+cd frontend/aqvp-web
+npm install
+npm run dev
+```
+
+The Vite dev server typically starts on `http://localhost:5173`.
+
+### 8.8 Open Swagger
+
+Once the Identity service is running:
+
+```text
+http://localhost:8081/swagger-ui.html
+```
+
+### 8.9 Log in with the demo account
+
+Use the seeded local admin account:
+
+```text
+Username: admin
+Password: Admin123!
+```
+
+### 8.10 Stop infrastructure
+
+```powershell
+docker compose -f docker/docker-compose.dev.yml --env-file .env down
+```
+
+To erase all local data, add `-v`:
+
+```powershell
+docker compose -f docker/docker-compose.dev.yml --env-file .env down -v
+```
+
+### 8.11 Security rules
 
 - **Never commit `.env` files.** They are ignored by `.gitignore`.
 - **Never commit passwords, secrets, API keys, tokens, private keys, or certificates.** If you accidentally commit one, rotate it immediately.
-- Use `git status` to confirm only `.env.example` files are staged, not `.env` files.
+- Use `git status` to confirm only `.env.example` is tracked, not `.env`.
 
 ---
 
@@ -409,6 +455,7 @@ git push origin feature/S2-XXX-description
 
 ## 17. Useful Resources
 
+- `docs/local-development-infrastructure.md` — local Docker Compose infrastructure guide
 - `docs/coding-standards.md` — coding and architectural standards
 - `docs/sprints/sprint-2-plan.md` — current sprint plan
 - `docs/module-development-guide.md` — module implementation handbook

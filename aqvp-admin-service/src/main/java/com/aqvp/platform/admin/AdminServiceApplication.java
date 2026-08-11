@@ -1,10 +1,10 @@
-package com.aqvp.admin;
+package com.aqvp.platform.admin;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Bootstrap for the Admin Service.
+ * Bootstrap for the AdminService service.
  */
 @SpringBootApplication
 public class AdminServiceApplication {
@@ -13,3 +13,4 @@ public class AdminServiceApplication {
         SpringApplication.run(AdminServiceApplication.class, args);
     }
 }
+

@@ -1,10 +1,10 @@
-package com.aqvp.verification;
+package com.aqvp.platform.verification;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Bootstrap for the Verification Service.
+ * Bootstrap for the VerificationService service.
  */
 @SpringBootApplication
 public class VerificationServiceApplication {
@@ -13,3 +13,4 @@ public class VerificationServiceApplication {
         SpringApplication.run(VerificationServiceApplication.class, args);
     }
 }
+

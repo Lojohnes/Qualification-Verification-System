@@ -1,0 +1,72 @@
+services:
+  aqvp-postgres:
+    image: postgres:16-alpine
+    container_name: aqvp-postgres
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME:-aqvp}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-aqvp}
+      POSTGRES_DB: ${DATABASE_NAME:-aqvp_db}
+    ports:
+      - "${DATABASE_PORT:-5432}:5432"
+    volumes:
+      - aqvp-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME:-aqvp} -d ${DATABASE_NAME:-aqvp_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aqvp-network
+
+  aqvp-redis:
+    image: redis:7-alpine
+    container_name: aqvp-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - aqvp-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - aqvp-network
+
+  aqvp-kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: aqvp-kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@aqvp-kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:19092,PLAINTEXT_HOST://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://aqvp-kafka:19092,PLAINTEXT_HOST://${KAFKA_HOST:-localhost}:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      CLUSTER_ID: SxC9s_NTQIeWl7cTiVBJgw
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+    volumes:
+      - aqvp-kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:19092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 6
+    networks:
+      - aqvp-network
+
+volumes:
+  aqvp-postgres-data:
+  aqvp-redis-data:
+  aqvp-kafka-data:
+
+networks:
+  aqvp-network:
+    name: aqvp-network
+    driver: bridge
