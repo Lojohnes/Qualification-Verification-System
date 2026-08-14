@@ -8,7 +8,7 @@
 
 # 1. System & Runtime Prerequisites
 # ------------------------------------------------------------------------------
-# Java Development Kit (JDK) 21 LTS (or JDK 17+ with source release 21)
+# Java Development Kit (JDK) 21 LTS
 # Apache Maven 3.9+
 # Node.js 20 LTS (or Node.js 18+)
 # npm 10+
@@ -18,13 +18,13 @@
 # 2. Backend Modules & Core Tech Stack (Maven pom.xml)
 # ------------------------------------------------------------------------------
 # - Java: 21
-# - Spring Boot: 3.3.4
+# - Spring Boot: 3.3.5
 # - Spring Cloud: 2023.0.3
 # - Spring Security & JWT (io.jsonwebtoken:jjwt:0.12.6)
 # - Spring Data JPA & Hibernate
 # - Database Migrations: Flyway (org.flywaydb:flyway-core)
 # - OpenAPI / Swagger Documentation: SpringDoc (springdoc-openapi-starter-webmvc-ui:2.6.0)
-# - Object Mapping: MapStruct (1.5.5.Final) & Lombok (1.18.34)
+# - Object Mapping: MapStruct (1.6.0) & Lombok (1.18.34)
 # - Code Quality: Checkstyle (10.17.0), SpotBugs (4.8.6.2), JaCoCo (0.8.12)
 # - Testing: JUnit 5, Mockito, AssertJ, Testcontainers (1.20.1)
 
