@@ -10,19 +10,19 @@ AQVP is currently a multi-module Spring Boot and React project with a completed 
 
 - Root Maven parent project with modules for shared kernel, identity, qualification, verification, admin, and API gateway.
 - Identity service with:
-  - JWT login, refresh, logout, change password, forgot password placeholder, reset password placeholder.
+  - JWT login, refresh, logout, change password, forgot password placeholder, reset password placeholder, and GET /api/v1/auth/me (current user details).
   - User CRUD list/create/update/delete surface.
-  - Role list/get/create/update surface.
-  - Permission list surface.
-  - API client service and filter infrastructure, but no REST controller for API client management.
-  - Spring Security stateless JWT configuration.
-  - BCrypt password encoding.
-  - Flyway migrations for identity schema and role/permission/admin seed data.
-  - Unit, controller, repository, security, validation, mapper, and exception tests.
-- API gateway scaffold with routes to identity, qualification, verification, and admin services.
-- Qualification, Verification, and Admin services have application classes, Maven modules, profiles, dependencies, and logging configuration.
-- Frontend foundation with:
-  - React/Vite/MUI application.
+- Identity & Access Module:
+  - Token-based authentication and authorization.
+  - User, Role, and Permission CRUD operations.
+  - API Client management (infrastructure).
+  - Secure `/api/v1/auth/me` endpoint.
+- Institution Module (under `aqvp-qualification-service`):
+  - Database schema migrations and entities for Institutions, Faculties, Departments, and Programs.
+  - Stateless JWT token validation filter and Security Configuration mapping permissions.
+  - REST endpoints for CRUD operations under `/api/v1/institutions` and `/api/v1/programs`.
+  - Comprehensive unit and integration tests.
+- React/Vite/MUI application.
   - Public login, register, forgot/reset password pages.
   - Protected layout, dashboard, identity pages, placeholders for future modules.
   - Axios, token storage, route guards, theme/snackbar contexts, and Redux store.
@@ -31,15 +31,14 @@ AQVP is currently a multi-module Spring Boot and React project with a completed 
 
 ## Partially Implemented
 
-- Frontend auth integration is present but depends on backend endpoint alignment. The frontend defines `/api/v1/auth/me`, but no matching `AuthController` endpoint exists in the current identity source.
 - API gateway routing exists, but the frontend default API base URL points directly at identity service port `8081`, not gateway port `8080`.
 - API client authentication infrastructure exists, but operational CRUD management is missing.
 - Password reset endpoints exist as placeholders only.
-- Qualification, Verification, and Admin services are structural scaffolds without domain models, migrations, controllers, or tests.
+- Qualification Service: core Institution module is implemented, but the Qualification/Student records and issuance workflow are missing.
+- Verification and Admin services are structural scaffolds without domain models, migrations, controllers, or tests.
 
 ## Not Yet Implemented
 
-- Institution, Faculty, Department, and Program modules.
 - Qualification records, student records, issuance, amendment, revocation, and CSV import.
 - Verification requests, consent validation, QR verification engine, certificate upload extraction, verification result persistence.
 - Document storage, PDF certificate generation, QR generation, and digital signatures.

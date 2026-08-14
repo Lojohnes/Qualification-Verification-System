@@ -6,13 +6,16 @@ import com.aqvp.platform.identity.dto.ChangePasswordRequest;
 import com.aqvp.platform.identity.dto.ForgotPasswordRequest;
 import com.aqvp.platform.identity.dto.RefreshTokenRequest;
 import com.aqvp.platform.identity.dto.ResetPasswordRequest;
+import com.aqvp.platform.identity.dto.UserResponseDto;
 import com.aqvp.platform.identity.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +32,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get current authenticated user details")
+    public ResponseEntity<UserResponseDto> getCurrentUser() {
+        return ResponseEntity.ok(authService.getCurrentUser());
+    }
 
     @PostMapping("/login")
     @Operation(summary = "Authenticate a user and obtain JWT tokens")

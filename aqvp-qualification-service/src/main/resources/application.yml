@@ -12,3 +12,8 @@ spring:
 
 server:
   port: 8082
+
+aqvp:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-me-very-long-secret-key-at-least-256-bits}

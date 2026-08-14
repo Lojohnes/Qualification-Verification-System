@@ -8,9 +8,11 @@ import com.aqvp.platform.identity.dto.ChangePasswordRequest;
 import com.aqvp.platform.identity.dto.ForgotPasswordRequest;
 import com.aqvp.platform.identity.dto.RefreshTokenRequest;
 import com.aqvp.platform.identity.dto.ResetPasswordRequest;
+import com.aqvp.platform.identity.dto.UserResponseDto;
 import com.aqvp.platform.identity.exception.EntityNotFoundException;
 import com.aqvp.platform.identity.exception.InvalidCredentialsException;
 import com.aqvp.platform.identity.exception.PasswordMismatchException;
+import com.aqvp.platform.identity.mapper.UserMapper;
 import com.aqvp.platform.identity.repository.UserRepository;
 import com.aqvp.platform.identity.security.JwtService;
 import com.aqvp.platform.identity.security.UserPrincipal;
@@ -39,6 +41,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Override
     @Transactional
@@ -120,5 +123,15 @@ public class AuthServiceImpl implements AuthService {
             throw new PasswordMismatchException("New password and confirmation do not match");
         }
         log.info("Password reset requested with token '{}' - placeholder implementation", dto.token());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("isAuthenticated()")
+    public UserResponseDto getCurrentUser() {
+        final String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        final User user = userRepository.findByUsername(username)
+            .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
+        return userMapper.toResponseDto(user);
     }
 }

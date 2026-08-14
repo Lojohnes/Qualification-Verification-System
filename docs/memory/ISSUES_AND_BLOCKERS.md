@@ -6,8 +6,6 @@ Last updated: 2026-08-10
 
 | ID | Severity | Area | Issue | Impact | Workaround / Next Action | Status |
 |---|---|---|---|---|---|---|
-| DOC-001 | Medium | Docs/build | Root build and CI use Java 21, but older onboarding text references Java 17 and identity module overrides compiler release to 17. | Developer setup confusion and inconsistent bytecode targets. | Decide project-wide target and update identity POM/onboarding accordingly. | Open |
-| API-001 | Medium | Identity/frontend | Frontend defines `/api/v1/auth/me`, but current `AuthController` has no `GET /api/v1/auth/me` endpoint. | Current-user fetch may fail if UI calls it. | Add endpoint or remove/adjust frontend usage after confirming intended auth flow. | Open |
 | API-002 | Medium | Gateway/frontend | API gateway routes exist on port 8080, but frontend default base URL is identity service on port 8081. | Frontend cannot transparently access future modules unless configured differently. | Decide gateway-first vs direct-service development mode. | Open |
 | SEC-001 | High | Identity security | Password reset endpoints are placeholders that only accept requests. | Users cannot complete real self-service reset. | Implement reset token persistence and notification dispatch or hide endpoints until ready. | Open |
 | SEC-002 | High | Identity security | Refresh tokens are stored as raw token values. | Database leak could expose long-lived tokens. | Store token hashes and compare by hash. | Open |
@@ -25,5 +23,6 @@ No hard technical blocker prevents documentation work. Feature development is bl
 
 | ID | Date | Area | Resolution |
 |---|---|---|---|
-| None recorded | 2026-08-10 | N/A | Start adding resolved issues here as they are fixed. |
+| DOC-001 | 2026-08-13 | Docs/build | Removed compiler release version overrides (17) in submodules, aligning entire codebase target to Java 21 as defined in root build/CI setup. |
+| API-001 | 2026-08-13 | Identity/frontend | Implemented `GET /api/v1/auth/me` on `AuthController` using `SecurityContextHolder` credentials and mapped flat list of permissions from roles. |
 

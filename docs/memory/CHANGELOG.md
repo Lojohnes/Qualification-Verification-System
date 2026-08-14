@@ -4,6 +4,27 @@ Last updated: 2026-08-10
 
 All notable project changes should be recorded here in chronological order.
 
+## 2026-08-13
+
+### Build / Compiler Target
+
+- Aligned compiler release versions to Java 21 across all modules by removing the `maven.compiler.release` overrides from `aqvp-shared-kernel/pom.xml` and `aqvp-identity-service/pom.xml`.
+
+### Identity Service
+
+- Implemented core Institution Module backend in `aqvp-qualification-service` (stories S2-001 & S2-002) including:
+  - Database schema migrations for `institutions`, `faculties`, `departments`, and `programs`.
+  - Core domain entities with proper relationships, cascading, and audit trails.
+  - DTO validation records and MapStruct mappers.
+  - Stateless JWT filter and `SecurityConfig` to authorize request permissions.
+  - REST controllers for `/api/v1/institutions` and `/api/v1/programs` CRUD actions.
+  - Integration and unit tests for controllers and services.
+- Added `GET /api/v1/auth/me` endpoint in `aqvp-identity-service` to retrieve the current authenticated user's details and dynamic permissions.
+- Aligned target compiler release setting to JDK 21 across the multi-module workspace.
+- Added comprehensive integration tests in `AuthControllerTest.java` verifying the `/me` endpoint behaviour and payload.
+- Updated mock test instantiations of `UserResponseDto` in `UserServiceTest` and `UserControllerTest` to include permissions.
+- Added `shouldReturnCurrentUserDetails` integration test case in `AuthControllerTest`.
+
 ## 2026-08-10
 
 ### Documentation

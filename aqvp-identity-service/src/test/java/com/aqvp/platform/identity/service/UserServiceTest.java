@@ -71,7 +71,7 @@ class UserServiceTest {
         when(userRepository.save(userEntity)).thenReturn(savedUser);
         when(userMapper.toResponseDto(savedUser)).thenReturn(
             new UserResponseDto(savedUser.getId(), savedUser.getUsername(), savedUser.getEmail(),
-                "John", "Doe", true, true, false, Set.of("USER"))
+                "John", "Doe", true, true, false, Set.of("USER"), Set.of())
         );
 
         final UserResponseDto response = userService.createUser(request);
@@ -93,7 +93,7 @@ class UserServiceTest {
         when(userRepository.findAll()).thenReturn(List.of(user));
         when(userMapper.toResponseDto(user)).thenReturn(
             new UserResponseDto(user.getId(), user.getUsername(), user.getEmail(),
-                null, null, true, false, false, Set.of())
+                null, null, true, false, false, Set.of(), Set.of())
         );
 
         final List<UserResponseDto> result = userService.findAll();

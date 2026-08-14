@@ -66,7 +66,7 @@ class UserControllerTest {
     void shouldReturnAllUsers() throws Exception {
         final UserResponseDto user = new UserResponseDto(
             UUID.randomUUID(), "johndoe", "john@aqvp.local", "John", "Doe",
-            true, false, false, Set.of("USER")
+            true, false, false, Set.of("USER"), Set.of()
         );
         when(userService.findAll()).thenReturn(List.of(user));
 
@@ -83,7 +83,7 @@ class UserControllerTest {
         );
         final UserResponseDto response = new UserResponseDto(
             id, request.username(), request.email(), request.firstName(), request.lastName(),
-            true, false, false, Set.of("USER")
+            true, false, false, Set.of("USER"), Set.of()
         );
 
         when(userRepository.existsByUsername(request.username())).thenReturn(false);
@@ -106,7 +106,7 @@ class UserControllerTest {
         );
         final UserResponseDto response = new UserResponseDto(
             id, "johndoe", request.email(), request.firstName(), request.lastName(),
-            true, false, false, Set.of("USER")
+            true, false, false, Set.of("USER"), Set.of()
         );
 
         when(userService.updateUser(any(UUID.class), any(UserUpdateRequestDto.class))).thenReturn(response);
