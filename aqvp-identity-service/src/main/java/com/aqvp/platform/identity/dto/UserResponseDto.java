@@ -15,9 +15,11 @@ public record UserResponseDto(
     Boolean enabled,
     Boolean emailVerified,
     Boolean mfaEnabled,
-    Set<String> roles
+    Set<String> roles,
+    Set<String> permissions
 ) {
     public UserResponseDto {
         roles = roles == null ? Set.of() : Set.copyOf(roles);
+        permissions = permissions == null ? Set.of() : Set.copyOf(permissions);
     }
 }

@@ -23,6 +23,7 @@ public interface UserMapper {
     User toEntity(UserRequestDto dto);
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "roleNames")
+    @Mapping(target = "permissions", source = "roles", qualifiedByName = "rolePermissions")
     UserResponseDto toResponseDto(User user);
 
     @Mapping(target = "id", ignore = true)
@@ -44,6 +45,17 @@ public interface UserMapper {
         }
         return roles.stream()
             .map(com.aqvp.platform.identity.domain.Role::getName)
+            .collect(Collectors.toSet());
+    }
+
+    @Named("rolePermissions")
+    default java.util.Set<String> rolePermissions(java.util.Set<com.aqvp.platform.identity.domain.Role> roles) {
+        if (roles == null) {
+            return java.util.Collections.emptySet();
+        }
+        return roles.stream()
+            .flatMap(role -> role.getPermissions().stream())
+            .map(com.aqvp.platform.identity.domain.Permission::getName)
             .collect(Collectors.toSet());
     }
 }

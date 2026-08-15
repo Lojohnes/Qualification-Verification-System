@@ -1,6 +1,6 @@
 # Decisions
 
-Last updated: 2026-08-10
+Last updated: 2026-08-14
 
 ## Decision Log
 
@@ -16,10 +16,11 @@ Last updated: 2026-08-10
 | 2026-07-29 / Sprint 1 | QR codes must identify and authenticate qualification records, not contain the full authoritative record or unnecessary biodata. | Plaintext QR payload containing all certificate data. | Protects personal information and keeps the server-side qualification database authoritative. | Active |
 | 2026-07-29 / Sprint 1 | Read-Only organizations cannot create or modify authoritative qualification records. | Single organization permission model. | Preserves trust boundary between verifiers and issuing institutions. | Active |
 | 2026-08-10 / Docs refactor | Treat `docs/memory` and `docs/reference` as the persistent project knowledge system. | Keep ad hoc root-level docs only. | Supports continuity across AI/developer sessions and keeps project state auditable. | Active |
+| 2026-08-13 | Align all compiler release targets to Java 21 across all Maven modules (removing Java 17 overrides from submodules). | Lower parent POM and CI pipeline to Java 17; keep mismatch with mixed bytecode targets. | Aligns with developer onboarding guide, CI pipeline targets, and leverages modern Java 21 features consistently across the microservices. | Active |
+| 2026-08-14 | Business modules use stateless JWT validation (extracting claims and authorities directly from incoming tokens). | Query the Identity service or its database for user info on each request. | Eliminates cross-service communication overhead and keeps services decoupled and high-performance. | Active |
 
 ## Open Decision Items
 
-- Resolve Java target mismatch: root `pom.xml` and CI use Java 21, while `aqvp-identity-service/pom.xml` overrides compiler release to 17 and older onboarding text mentions Java 17.
 - Decide whether the frontend should call services directly or use the API gateway as its default base URL.
 - Decide whether API client management requires public administrative REST endpoints.
 - Choose production strategy for password reset delivery, email/SMS providers, rate limiting, and refresh-token hashing.

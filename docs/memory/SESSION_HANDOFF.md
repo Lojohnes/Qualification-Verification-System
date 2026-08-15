@@ -22,24 +22,20 @@ The new documents were populated from the current business requirements, coding 
 
 ## Unfinished Work
 
-- Resolve Java target mismatch between root build/CI docs and identity service module override.
-- Align frontend auth contract with backend Identity endpoints.
 - Implement business modules.
-- Run full verification after documentation refactor if desired.
+- Choose production strategy for password reset, rate limiting, and CORS configurations.
 
 ## Current Problems
 
-- Java version inconsistency: root and CI use Java 21; identity module overrides Java 17; older onboarding text mentions Java 17.
-- Frontend defines an auth `ME` endpoint not implemented by the current Identity controller.
 - Password reset endpoints are placeholders.
-- Frontend defaults to direct Identity service calls while gateway routing exists.
+- Frontend defaults to direct Identity service calls (port 8081) while gateway routing exists (port 8080).
 - Business modules are not yet implemented beyond scaffolding.
 
 ## Recommended Next Actions
 
-1. Decide and implement Java version alignment.
-2. Add `GET /api/v1/auth/me` or remove the frontend dependency on it.
-3. Pick the next backend business module, likely Institution, and implement it using Identity as the reference.
+1. Pick the next backend business module, likely Qualification, and implement it using Identity and Institution as references.
+2. Update the frontend default base API URL to route requests through the API gateway on port 8080 instead of pointing directly to the identity service on port 8081.
+3. Implement password reset token verification/persistence and integrate with notification dispatch services.
 4. Update `docs/memory` and the relevant `docs/reference` files after each implementation slice.
 
 ## Important Files and Modules

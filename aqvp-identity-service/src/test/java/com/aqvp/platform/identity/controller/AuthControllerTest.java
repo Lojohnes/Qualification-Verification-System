@@ -2,6 +2,7 @@ package com.aqvp.platform.identity.controller;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -12,8 +13,11 @@ import com.aqvp.platform.identity.dto.ChangePasswordRequest;
 import com.aqvp.platform.identity.dto.ForgotPasswordRequest;
 import com.aqvp.platform.identity.dto.RefreshTokenRequest;
 import com.aqvp.platform.identity.dto.ResetPasswordRequest;
+import com.aqvp.platform.identity.dto.UserResponseDto;
 import com.aqvp.platform.identity.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Set;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -126,5 +130,22 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isAccepted());
+    }
+
+    @Test
+    void shouldReturnCurrentUserDetails() throws Exception {
+        final UserResponseDto response = new UserResponseDto(
+            UUID.randomUUID(), "johndoe", "john@aqvp.local", "John", "Doe",
+            true, true, false, Set.of("USER"), Set.of("user:read")
+        );
+
+        when(authService.getCurrentUser()).thenReturn(response);
+
+        mockMvc.perform(get("/api/v1/auth/me"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value("johndoe"))
+            .andExpect(jsonPath("$.email").value("john@aqvp.local"))
+            .andExpect(jsonPath("$.roles[0]").value("USER"))
+            .andExpect(jsonPath("$.permissions[0]").value("user:read"));
     }
 }

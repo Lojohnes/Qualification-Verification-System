@@ -1,21 +1,21 @@
 # Work TODO
 
-Last updated: 2026-08-10
+Last updated: 2026-08-14
 
 ## Highest Priority
 
 | Priority | Task | Dependencies | Acceptance Criteria | Status |
 |---|---|---|---|---|
-| P0 | Resolve Java version mismatch. | Root POM, identity POM, onboarding docs, CI. | All setup/build docs and Maven compiler settings agree on the intended Java version. | Pending |
-| P0 | Add or remove frontend `/api/v1/auth/me` contract. | Identity auth service/controller, frontend auth service. | Current-user flow is implemented and tested, or frontend no longer calls a missing endpoint. | Pending |
+| P0 | Resolve Java version mismatch. | Root POM, identity POM, onboarding docs, CI. | All setup/build docs and Maven compiler settings agree on the intended Java version. | Complete |
+| P0 | Add or remove frontend `/api/v1/auth/me` contract. | Identity auth service/controller, frontend auth service. | Current-user flow is implemented and tested, or frontend no longer calls a missing endpoint. | Complete |
 | P0 | Implement real password reset or remove placeholder behavior from exposed UX. | Identity service, notification provider. | Reset flow creates/verifies tokens and dispatches notification, or endpoints are clearly marked unavailable. | Pending |
-| P0 | Implement first business module domain and API. | Identity permission model, module development standards. | At least one business module has migrations, entities, DTOs, services, controllers, OpenAPI docs, and tests. | Pending |
+| P0 | Implement first business module domain and API. | Identity permission model, module development standards. | At least one business module has migrations, entities, DTOs, services, controllers, OpenAPI docs, and tests. | Complete |
 
 ## Backend Business Modules
 
 | Priority | Task | Notes | Status |
 |---|---|---|---|
-| P1 | Institution module: institutions, faculties, departments, programs. | Unique institution code and tenant boundaries are core rules. | Pending |
+| P1 | Institution module: institutions, faculties, departments, programs. | Unique institution code and tenant boundaries are core rules. | Complete |
 | P1 | Qualification module: students, qualification records, issuance, amendment, revocation. | Must preserve history; avoid permanent deletes for qualifications. | Pending |
 | P1 | Verification module: request intake, consent validation, QR verification, result tracking. | Verification must compare to authoritative server-side record. | Pending |
 | P1 | Document module: certificate templates, PDF generation, QR embedding, digital signatures, storage metadata. | Consider async processing for heavy document generation. | Pending |
@@ -35,7 +35,7 @@ Last updated: 2026-08-10
 
 | Priority | Task | Notes | Status |
 |---|---|---|---|
-| P1 | Run full Maven verification in current workspace. | Especially after Java version decision. | Pending |
+| P1 | Run full Maven verification in current workspace. | Especially after Java version decision. | Complete |
 | P1 | Run Identity Testcontainers migration test in Docker-capable environment. | Currently reported skipped when Docker unavailable. | Pending |
 | P1 | Add tests for any new business module before merge. | Unit, repository, controller, security, and integration tests. | Pending |
 | P2 | Add E2E tests for issue-to-verify workflow once modules exist. | Candidate tools: Playwright or Cypress. | Pending |
