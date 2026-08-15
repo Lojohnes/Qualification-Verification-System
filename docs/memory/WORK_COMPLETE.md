@@ -1,11 +1,12 @@
 # Work Complete
 
-Last updated: 2026-08-14
+Last updated: 2026-08-15
 
 ## Completed Project Work
 
 | Date / Phase | Area | Completed Work | Evidence |
 |---|---|---|---|
+| 2026-08-15 | Frontend / Institution | Replaced the Institution placeholder page with working Institutions and Programs screens (list, search, create, edit, deactivate/delete) wired to the live `aqvp-qualification-service` REST API. Added a second authenticated axios client (`qualificationApi`) sharing the existing token/refresh interceptor logic, new routes, and Sidebar navigation entries. | `frontend/aqvp-web/src/features/institution`, `frontend/aqvp-web/src/config/axios.ts`, `frontend/aqvp-web/src/constants/api.ts`, `frontend/aqvp-web/src/constants/routes.ts`, `App.tsx`, `Sidebar.tsx` |
 | 2026-07-29 / Sprint 1 | Identity | Implemented Identity and Access module with JWT authentication, refresh tokens, user/role/permission management, API client authentication infrastructure, migrations, tests, and testing artifacts. | `aqvp-identity-service`, identity test report |
 | 2026-07-29 / Sprint 1 | CI/CD | Added GitHub Actions workflow for Maven verify with static analysis and JaCoCo artifact upload. | `.github/workflows/ci.yml` |
 | 2026-07-29 / Sprint 1 | Project standards | Added business requirements, coding standards, module development guide, team guidelines, developer onboarding, and Sprint 2 plan. | Archived under `docs/reference/legacy` |
@@ -22,3 +23,4 @@ Last updated: 2026-08-14
 | 2026-07-29 | Static analysis | Identity report states Checkstyle and SpotBugs pass cleanly. |
 | 2026-08-13 | Identity/Build verification | 103 tests reported: 102 passed, 1 skipped because Docker was unavailable. Clean compile under JDK 21. |
 | 2026-08-14 | Institution automated suite | 13 tests passed, clean checkstyle and spotbugs pass. |
+| 2026-08-15 | Frontend build/lint | `npm run build` (tsc + vite build) succeeded; `npm run lint` passed with zero errors/warnings after `lint:fix`. |

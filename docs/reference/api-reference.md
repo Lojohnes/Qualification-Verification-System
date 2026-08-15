@@ -1,16 +1,15 @@
 # API Reference
 
-Last updated: 2026-08-10
+Last updated: 2026-08-15
 
 ## Base URLs
 
-Current implemented Identity service:
+Current implemented services:
 
-- Direct: `http://localhost:8081`
-- Swagger UI: `http://localhost:8081/swagger-ui.html`
-- OpenAPI JSON: `http://localhost:8081/v3/api-docs`
+- Identity service: `http://localhost:8081` (Swagger UI: `/swagger-ui.html`, OpenAPI JSON: `/v3/api-docs`)
+- Qualification service (Institution module): `http://localhost:8082`
 
-Gateway routes exist on `http://localhost:8080`, but the frontend currently defaults to direct Identity service access at `http://localhost:8081`.
+Gateway routes exist on `http://localhost:8080`, but the frontend currently defaults to direct service access: `VITE_API_BASE_URL` (default `http://localhost:8081`) for Identity and `VITE_QUALIFICATION_API_BASE_URL` (default `http://localhost:8082`) for Qualification.
 
 ## Authentication
 
@@ -48,6 +47,26 @@ Known mismatch:
 | POST | `/api/v1/roles` | Create role. | `role:write` |
 | PUT | `/api/v1/roles/{id}` | Update role. | `role:write` enforced at service method level. |
 | GET | `/api/v1/permissions` | List permissions. | `role:read` |
+
+## Qualification Service Endpoints (Institution Module)
+
+| Method | Path | Purpose | Required Authority |
+|---|---|---|---|
+| GET | `/api/v1/institutions` | List institutions. | `institution:read` |
+| GET | `/api/v1/institutions/{id}` | Get institution by ID. | `institution:read` |
+| POST | `/api/v1/institutions` | Create institution. | `institution:write` |
+| PUT | `/api/v1/institutions/{id}` | Update institution. | `institution:write` |
+| DELETE | `/api/v1/institutions/{id}` | Deactivate institution (soft, no hard delete). | `institution:write` |
+| GET | `/api/v1/programs` | List programs; supports optional `?institutionId=` filter. | `program:read` |
+| GET | `/api/v1/programs/{id}` | Get program by ID. | `program:read` |
+| POST | `/api/v1/programs` | Create program. | `program:write` |
+| PUT | `/api/v1/programs/{id}` | Update program. | `program:write` |
+| DELETE | `/api/v1/programs/{id}` | Delete program. | `program:write` |
+
+Known gaps:
+
+- No Faculty/Department REST endpoints exist yet. `ProgramRequestDto.departmentId` must be a valid UUID from the `departments` table; the frontend Program form currently requires this to be entered manually.
+- The Identity seed migration (`V2__seed_roles_permissions.sql`) does not grant `institution:*`/`program:*` authorities to the default admin role, so these endpoints currently return `403` for the seeded admin user until permissions are added.
 
 ## Example Login Request
 
@@ -94,4 +113,4 @@ Common statuses:
 
 ## Planned APIs
 
-Business module APIs are not implemented yet. Future APIs should follow `/api/v1/<plural-resource>` naming, DTO boundaries, OpenAPI annotations, pagination for list endpoints, and permission checks using Identity authorities.
+The Institution module (Institutions, Programs) is implemented; remaining business module APIs (Qualification records, Verification, Document, Audit, Notification) are not implemented yet. Future APIs should follow `/api/v1/<plural-resource>` naming, DTO boundaries, OpenAPI annotations, pagination for list endpoints, and permission checks using Identity authorities.

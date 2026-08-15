@@ -15,6 +15,8 @@ import { DashboardPage } from '@/features/dashboard/pages/DashboardPage';
 import { UsersPage } from '@/features/identity/pages/UsersPage';
 import { RolesPage } from '@/features/identity/pages/RolesPage';
 import { PermissionsPage } from '@/features/identity/pages/PermissionsPage';
+import { InstitutionsPage } from '@/features/institution/pages/InstitutionsPage';
+import { ProgramsPage } from '@/features/institution/pages/ProgramsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { ROUTES } from '@/constants/routes';
 
@@ -42,8 +44,10 @@ function App() {
 
             <Route
               path={ROUTES.INSTITUTION}
-              element={<PlaceholderPage module="Institution" sprint="Sprint 3" />}
+              element={<Navigate to={ROUTES.INSTITUTIONS} replace />}
             />
+            <Route path={ROUTES.INSTITUTIONS} element={<InstitutionsPage />} />
+            <Route path={ROUTES.PROGRAMS} element={<ProgramsPage />} />
             <Route
               path={ROUTES.QUALIFICATION}
               element={<PlaceholderPage module="Qualification" sprint="Sprint 3" />}

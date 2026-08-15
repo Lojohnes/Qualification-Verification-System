@@ -1,8 +1,19 @@
 # Changelog
 
-Last updated: 2026-08-10
+Last updated: 2026-08-15
 
 All notable project changes should be recorded here in chronological order.
+
+## 2026-08-15
+
+### Frontend
+
+- Implemented Institutions and Programs screens in `frontend/aqvp-web` (`src/features/institution`), replacing the Institution placeholder page: list with search, create/edit dialogs (react-hook-form + yup), deactivate/delete confirmation, and Program-to-Institution filtering.
+- Added a second authenticated axios client (`qualificationApi`) in `src/config/axios.ts`, refactoring the module into a shared `createApiClient`/`attachAuthInterceptors` factory so both the Identity and Qualification service clients reuse the same token attach/refresh logic.
+- Added `QUALIFICATION_API_BASE_URL` (defaults to `http://localhost:8082`, override via `VITE_QUALIFICATION_API_BASE_URL`) and `API_ENDPOINTS.QUALIFICATION` in `src/constants/api.ts`.
+- Added `ROUTES.INSTITUTIONS` and `ROUTES.PROGRAMS`; `ROUTES.INSTITUTION` now redirects to `ROUTES.INSTITUTIONS`. Updated `App.tsx` routing and `Sidebar.tsx` navigation to match the Identity section's header/indented-items pattern.
+- Verified with `npm run build` (tsc + vite) and `npm run lint` (zero errors/warnings).
+- Documented two known integration gaps without touching backend code: (1) the Program form requires a manually entered Department UUID because no Faculty/Department REST endpoints exist yet; (2) the Identity seed migration does not yet grant `institution:*`/`program:*` authorities to the default admin role, so these screens will return `403` until that is seeded or granted.
 
 ## 2026-08-13
 

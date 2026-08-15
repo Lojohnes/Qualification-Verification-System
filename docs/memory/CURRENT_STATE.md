@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-08-10
+Last updated: 2026-08-15
 
 ## Implementation Status
 
@@ -26,6 +26,7 @@ AQVP is currently a multi-module Spring Boot and React project with a completed 
   - Public login, register, forgot/reset password pages.
   - Protected layout, dashboard, identity pages, placeholders for future modules.
   - Axios, token storage, route guards, theme/snackbar contexts, and Redux store.
+  - Institution module frontend (`frontend/aqvp-web/src/features/institution`): Institutions and Programs list/create/edit/deactivate screens wired to the live Qualification service REST API (`http://localhost:8082` by default, via `VITE_QUALIFICATION_API_BASE_URL`), using a second authenticated axios client (`qualificationApi`) that shares the existing token/refresh interceptor logic.
 - Docker Compose infrastructure for PostgreSQL, Keycloak, Zookeeper, and Kafka.
 - GitHub Actions CI configured for Maven verify with static analysis.
 
@@ -35,6 +36,8 @@ AQVP is currently a multi-module Spring Boot and React project with a completed 
 - API client authentication infrastructure exists, but operational CRUD management is missing.
 - Password reset endpoints exist as placeholders only.
 - Qualification Service: core Institution module is implemented, but the Qualification/Student records and issuance workflow are missing.
+- Program create/edit UI requires a Department UUID entered manually because no Faculty/Department REST endpoints exist yet to populate a selector; the schema and repositories exist but there is no controller.
+- The Institution/Program screens require the Identity-issued JWT to include `institution:read`, `institution:write`, `program:read`, and `program:write` authorities. These permissions are not present in the current Identity seed migration (`V2__seed_roles_permissions.sql`), so the default admin role must be granted them (or the migration updated) before the new screens will return data instead of `403`.
 - Verification and Admin services are structural scaffolds without domain models, migrations, controllers, or tests.
 
 ## Not Yet Implemented
