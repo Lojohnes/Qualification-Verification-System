@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 
-import type { LoginRequest, User } from '@/types/auth';
+import type { LoginRequest, RegisterRequest, User } from '@/types/auth';
 import { STORAGE_KEYS } from '@/constants/storage';
 import { getItem, removeItem, setItem } from '@/utils/storage';
 import { authService } from '@/features/auth/services/authService';
+import { getApiErrorMessage } from '@/utils/errors';
 import { parseUserFromToken } from '@/utils/jwt';
 
 interface AuthState {
@@ -47,6 +48,18 @@ export const login = createAsyncThunk(
       return response;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Login failed');
+    }
+  }
+);
+
+export const register = createAsyncThunk(
+  'auth/register',
+  async (data: RegisterRequest, { rejectWithValue }) => {
+    try {
+      const response = await authService.register(data);
+      return response;
+    } catch (error) {
+      return rejectWithValue(getApiErrorMessage(error, 'Registration failed'));
     }
   }
 );
@@ -120,6 +133,27 @@ const authSlice = createSlice({
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = (action.payload as string) ?? 'Login failed';
+      })
+      .addCase(register.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.accessToken = action.payload.accessToken;
+        state.refreshToken = action.payload.refreshToken;
+        state.user = action.payload.user;
+        state.isAuthenticated = true;
+        state.sessionExpired = false;
+        setItem(STORAGE_KEYS.ACCESS_TOKEN, action.payload.accessToken);
+        setItem(STORAGE_KEYS.REFRESH_TOKEN, action.payload.refreshToken);
+        if (action.payload.user) {
+          setItem(STORAGE_KEYS.USER, action.payload.user);
+        }
+      })
+      .addCase(register.rejected, (state, action) => {
+        state.loading = false;
+        state.error = (action.payload as string) ?? 'Registration failed';
       })
       .addCase(refreshAccessToken.fulfilled, (state, action) => {
         state.accessToken = action.payload.accessToken;

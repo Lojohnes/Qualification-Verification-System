@@ -1,21 +1,28 @@
 package com.aqvp.platform.identity.service;
 
 import com.aqvp.platform.identity.domain.RefreshToken;
+import com.aqvp.platform.identity.domain.Role;
 import com.aqvp.platform.identity.domain.User;
 import com.aqvp.platform.identity.dto.AuthenticationRequest;
 import com.aqvp.platform.identity.dto.AuthenticationResponse;
 import com.aqvp.platform.identity.dto.ChangePasswordRequest;
 import com.aqvp.platform.identity.dto.ForgotPasswordRequest;
 import com.aqvp.platform.identity.dto.RefreshTokenRequest;
+import com.aqvp.platform.identity.dto.RegisterRequest;
+import com.aqvp.platform.identity.dto.RegistrationStatusResponse;
 import com.aqvp.platform.identity.dto.ResetPasswordRequest;
 import com.aqvp.platform.identity.dto.UserResponseDto;
 import com.aqvp.platform.identity.exception.EntityNotFoundException;
 import com.aqvp.platform.identity.exception.InvalidCredentialsException;
 import com.aqvp.platform.identity.exception.PasswordMismatchException;
+import com.aqvp.platform.identity.exception.RegistrationDisabledException;
 import com.aqvp.platform.identity.mapper.UserMapper;
+import com.aqvp.platform.identity.repository.RoleRepository;
 import com.aqvp.platform.identity.repository.UserRepository;
 import com.aqvp.platform.identity.security.JwtService;
 import com.aqvp.platform.identity.security.UserPrincipal;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
@@ -65,6 +73,49 @@ public class AuthServiceImpl implements AuthService {
             log.warn("Failed login attempt for '{}'", dto.usernameOrEmail());
             throw new InvalidCredentialsException("Invalid username/email or password");
         }
+    }
+
+    @Override
+    @Transactional
+    public AuthenticationResponse register(RegisterRequest dto) {
+        if (userRepository.count() > 0) {
+            throw new RegistrationDisabledException(
+                "Self-registration is disabled. Please contact your administrator for an account.");
+        }
+
+        final Role adminRole = roleRepository.findByName("ADMIN")
+            .orElseThrow(() -> new IllegalStateException(
+                "ADMIN role not found. Ensure database migrations have run."));
+
+        final User user = User.builder()
+            .username(dto.username())
+            .email(dto.email())
+            .password(passwordEncoder.encode(dto.password()))
+            .firstName(dto.firstName())
+            .lastName(dto.lastName())
+            .enabled(true)
+            .emailVerified(true)
+            .roles(new HashSet<>(Set.of(adminRole)))
+            .build();
+
+        final User saved = userRepository.save(user);
+        log.info("Registered first account '{}' as ADMIN with id {}", saved.getUsername(), saved.getId());
+
+        final UserPrincipal principal = UserPrincipal.of(saved);
+        final String accessToken = jwtService.generateAccessToken(principal);
+        final RefreshToken refreshToken = refreshTokenService.createRefreshToken(saved);
+        return new AuthenticationResponse(
+            accessToken,
+            refreshToken.getToken(),
+            "Bearer",
+            jwtService.getAccessExpirationMs() / 1000
+        );
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RegistrationStatusResponse getRegistrationStatus() {
+        return new RegistrationStatusResponse(userRepository.count() == 0);
     }
 
     @Override

@@ -5,6 +5,8 @@ import com.aqvp.platform.identity.dto.AuthenticationResponse;
 import com.aqvp.platform.identity.dto.ChangePasswordRequest;
 import com.aqvp.platform.identity.dto.ForgotPasswordRequest;
 import com.aqvp.platform.identity.dto.RefreshTokenRequest;
+import com.aqvp.platform.identity.dto.RegisterRequest;
+import com.aqvp.platform.identity.dto.RegistrationStatusResponse;
 import com.aqvp.platform.identity.dto.ResetPasswordRequest;
 import com.aqvp.platform.identity.dto.UserResponseDto;
 
@@ -14,6 +16,10 @@ import com.aqvp.platform.identity.dto.UserResponseDto;
 public interface AuthService {
 
     AuthenticationResponse login(AuthenticationRequest dto);
+
+    AuthenticationResponse register(RegisterRequest dto);
+
+    RegistrationStatusResponse getRegistrationStatus();
 
     void logout(RefreshTokenRequest dto);
 

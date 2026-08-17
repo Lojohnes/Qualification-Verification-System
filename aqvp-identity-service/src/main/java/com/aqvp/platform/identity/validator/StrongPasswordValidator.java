@@ -10,7 +10,8 @@ import java.util.regex.Pattern;
 public class StrongPasswordValidator implements ConstraintValidator<StrongPassword, String> {
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
-        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$"
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[-@$!%*?&#^()_+=\\[\\]{}:;,.<>/~])"
+            + "[A-Za-z\\d@$!%*?&#^()_+=\\[\\]{}:;,.<>/~-]{8,}$"
     );
 
     @Override

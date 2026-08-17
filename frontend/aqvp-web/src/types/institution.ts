@@ -18,6 +18,46 @@ export interface InstitutionRequest {
   active?: boolean;
 }
 
+export interface Faculty {
+  id: string;
+  institutionId: string;
+  institutionName?: string;
+  name: string;
+  code: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  version?: number;
+}
+
+export interface FacultyRequest {
+  institutionId: string;
+  name: string;
+  code: string;
+}
+
+export interface Department {
+  id: string;
+  facultyId: string;
+  facultyName?: string;
+  institutionId?: string;
+  institutionName?: string;
+  name: string;
+  code: string;
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  version?: number;
+}
+
+export interface DepartmentRequest {
+  facultyId: string;
+  name: string;
+  code: string;
+}
+
 export interface Program {
   id: string;
   institutionId: string;

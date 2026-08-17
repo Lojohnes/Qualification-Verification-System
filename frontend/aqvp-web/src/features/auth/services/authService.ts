@@ -4,6 +4,8 @@ import type {
   AuthResponse,
   ForgotPasswordRequest,
   LoginRequest,
+  RegisterRequest,
+  RegistrationStatusResponse,
   ResetPasswordRequest,
   User,
 } from '@/types/auth';
@@ -24,6 +26,19 @@ export const authService = {
     const response = await publicApi.post<AuthResponse>(API_ENDPOINTS.AUTH.LOGIN, credentials);
     const user = parseUserFromToken(response.data.accessToken);
     return { ...response.data, user };
+  },
+
+  register: async (data: RegisterRequest): Promise<AuthResponse & { user: User | null }> => {
+    const response = await publicApi.post<AuthResponse>(API_ENDPOINTS.AUTH.REGISTER, data);
+    const user = parseUserFromToken(response.data.accessToken);
+    return { ...response.data, user };
+  },
+
+  getRegistrationStatus: async (): Promise<RegistrationStatusResponse> => {
+    const response = await publicApi.get<RegistrationStatusResponse>(
+      API_ENDPOINTS.AUTH.REGISTRATION_STATUS
+    );
+    return response.data;
   },
 
   logout: async (refreshToken: string): Promise<void> => {

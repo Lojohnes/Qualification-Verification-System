@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm, type SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -13,17 +13,12 @@ import {
   TextField,
 } from '@mui/material';
 
-import type { Institution, Program, ProgramRequest } from '@/types/institution';
-
-const UUID_PATTERN =
-  /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+import { institutionService } from '@/features/institution/services/institutionService';
+import type { Department, Faculty, Institution, Program, ProgramRequest } from '@/types/institution';
 
 const schema = yup.object({
   institutionId: yup.string().required('Institution is required'),
-  departmentId: yup
-    .string()
-    .required('Department ID is required')
-    .matches(UUID_PATTERN, 'Department ID must be a valid UUID'),
+  departmentId: yup.string().required('Department is required'),
   name: yup.string().required('Name is required').max(150, 'Name must not exceed 150 characters'),
   code: yup.string().required('Code is required').max(30, 'Code must not exceed 30 characters'),
   degreeLevel: yup.string().max(50, 'Degree level must not exceed 50 characters'),
@@ -56,6 +51,8 @@ export function ProgramFormDialog({
     control,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<ProgramRequest>({
     resolver: yupResolver(schema) as never,
@@ -69,6 +66,12 @@ export function ProgramFormDialog({
     },
   });
 
+  const [faculties, setFaculties] = useState<Faculty[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [facultyId, setFacultyId] = useState('');
+
+  const institutionId = watch('institutionId');
+
   useEffect(() => {
     if (open) {
       reset({
@@ -79,8 +82,37 @@ export function ProgramFormDialog({
         degreeLevel: program?.degreeLevel ?? '',
         durationSemesters: program?.durationSemesters,
       });
+      setFaculties([]);
+      setDepartments([]);
+      if (program?.departmentId) {
+        institutionService
+          .getDepartmentById(program.departmentId)
+          .then((department) => setFacultyId(department.facultyId))
+          .catch(() => setFacultyId(''));
+      } else {
+        setFacultyId('');
+      }
     }
   }, [open, program, reset]);
+
+  useEffect(() => {
+    if (!institutionId) {
+      setFaculties([]);
+      return;
+    }
+    institutionService.getFaculties(institutionId).then(setFaculties).catch(() => setFaculties([]));
+  }, [institutionId]);
+
+  useEffect(() => {
+    if (!facultyId) {
+      setDepartments([]);
+      return;
+    }
+    institutionService
+      .getDepartments(facultyId)
+      .then(setDepartments)
+      .catch(() => setDepartments([]));
+  }, [facultyId]);
 
   const submitHandler: SubmitHandler<ProgramRequest> = (data) => {
     onSubmit(data);
@@ -103,6 +135,11 @@ export function ProgramFormDialog({
                 margin="normal"
                 error={!!errors.institutionId}
                 helperText={errors.institutionId?.message}
+                onChange={(e) => {
+                  field.onChange(e);
+                  setFacultyId('');
+                  setValue('departmentId', '');
+                }}
               >
                 {institutions.map((institution) => (
                   <MenuItem key={institution.id} value={institution.id}>
@@ -113,15 +150,48 @@ export function ProgramFormDialog({
             )}
           />
           <TextField
-            {...register('departmentId')}
-            label="Department ID"
+            select
+            label="Faculty"
             fullWidth
             margin="normal"
-            error={!!errors.departmentId}
-            helperText={
-              errors.departmentId?.message ??
-              'Enter the department UUID. A department directory is not yet available.'
-            }
+            value={facultyId}
+            disabled={!institutionId}
+            onChange={(e) => {
+              setFacultyId(e.target.value);
+              setValue('departmentId', '');
+            }}
+            helperText={!institutionId ? 'Select an institution first' : undefined}
+          >
+            {faculties.map((faculty) => (
+              <MenuItem key={faculty.id} value={faculty.id}>
+                {faculty.name}
+              </MenuItem>
+            ))}
+          </TextField>
+          <Controller
+            name="departmentId"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                select
+                label="Department"
+                fullWidth
+                margin="normal"
+                disabled={!facultyId}
+                error={!!errors.departmentId}
+                helperText={
+                  errors.departmentId?.message ??
+                  (!facultyId ? 'Select a faculty first' : undefined)
+                }
+              >
+                {departments.map((department) => (
+                  <MenuItem key={department.id} value={department.id}>
+                    {department.name}
+                  </MenuItem>
+                ))}
+              </TextField>
+            )}
           />
           <TextField
             {...register('name')}

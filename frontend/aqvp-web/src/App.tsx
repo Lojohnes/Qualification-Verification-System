@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import { PublicRoute } from '@/components/auth/PublicRoute';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { PermissionRoute } from '@/components/auth/PermissionRoute';
 import { SessionExpiredDialog } from '@/components/auth/SessionExpiredDialog';
 import { MainLayout } from '@/layouts/MainLayout';
 import { LoginPage } from '@/features/auth/pages/LoginPage';
@@ -16,7 +17,10 @@ import { UsersPage } from '@/features/identity/pages/UsersPage';
 import { RolesPage } from '@/features/identity/pages/RolesPage';
 import { PermissionsPage } from '@/features/identity/pages/PermissionsPage';
 import { InstitutionsPage } from '@/features/institution/pages/InstitutionsPage';
+import { FacultiesPage } from '@/features/institution/pages/FacultiesPage';
+import { DepartmentsPage } from '@/features/institution/pages/DepartmentsPage';
 import { ProgramsPage } from '@/features/institution/pages/ProgramsPage';
+import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { ROUTES } from '@/constants/routes';
 
@@ -38,15 +42,21 @@ function App() {
           <Route element={<MainLayout />}>
             <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
 
-            <Route path={ROUTES.USERS} element={<UsersPage />} />
-            <Route path={ROUTES.ROLES} element={<RolesPage />} />
-            <Route path={ROUTES.PERMISSIONS} element={<PermissionsPage />} />
+            <Route element={<PermissionRoute permission="user:read" />}>
+              <Route path={ROUTES.USERS} element={<UsersPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission="role:read" />}>
+              <Route path={ROUTES.ROLES} element={<RolesPage />} />
+              <Route path={ROUTES.PERMISSIONS} element={<PermissionsPage />} />
+            </Route>
 
             <Route
               path={ROUTES.INSTITUTION}
               element={<Navigate to={ROUTES.INSTITUTIONS} replace />}
             />
             <Route path={ROUTES.INSTITUTIONS} element={<InstitutionsPage />} />
+            <Route path={ROUTES.FACULTIES} element={<FacultiesPage />} />
+            <Route path={ROUTES.DEPARTMENTS} element={<DepartmentsPage />} />
             <Route path={ROUTES.PROGRAMS} element={<ProgramsPage />} />
             <Route
               path={ROUTES.QUALIFICATION}
@@ -68,10 +78,7 @@ function App() {
               path={ROUTES.REPORTS}
               element={<PlaceholderPage module="Reports" sprint="Sprint 5" />}
             />
-            <Route
-              path={ROUTES.SETTINGS}
-              element={<PlaceholderPage module="Settings" sprint="Sprint 6" />}
-            />
+            <Route path={ROUTES.SETTINGS} element={<SettingsPage />} />
           </Route>
         </Route>
 

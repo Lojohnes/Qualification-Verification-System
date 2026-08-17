@@ -1,6 +1,15 @@
 import { qualificationApi } from '@/config/axios';
 import { API_ENDPOINTS } from '@/constants/api';
-import type { Institution, InstitutionRequest, Program, ProgramRequest } from '@/types/institution';
+import type {
+  Department,
+  DepartmentRequest,
+  Faculty,
+  FacultyRequest,
+  Institution,
+  InstitutionRequest,
+  Program,
+  ProgramRequest,
+} from '@/types/institution';
 
 export const institutionService = {
   getInstitutions: async () => {
@@ -35,6 +44,70 @@ export const institutionService = {
 
   deactivateInstitution: async (id: string) => {
     await qualificationApi.delete(`${API_ENDPOINTS.QUALIFICATION.INSTITUTIONS}/${id}`);
+  },
+
+  getFaculties: async (institutionId?: string) => {
+    const response = await qualificationApi.get<Faculty[]>(API_ENDPOINTS.QUALIFICATION.FACULTIES, {
+      params: institutionId ? { institutionId } : undefined,
+    });
+    return response.data;
+  },
+
+  createFaculty: async (payload: FacultyRequest) => {
+    const response = await qualificationApi.post<Faculty>(
+      API_ENDPOINTS.QUALIFICATION.FACULTIES,
+      payload
+    );
+    return response.data;
+  },
+
+  updateFaculty: async (id: string, payload: FacultyRequest) => {
+    const response = await qualificationApi.put<Faculty>(
+      `${API_ENDPOINTS.QUALIFICATION.FACULTIES}/${id}`,
+      payload
+    );
+    return response.data;
+  },
+
+  deleteFaculty: async (id: string) => {
+    await qualificationApi.delete(`${API_ENDPOINTS.QUALIFICATION.FACULTIES}/${id}`);
+  },
+
+  getDepartments: async (facultyId?: string) => {
+    const response = await qualificationApi.get<Department[]>(
+      API_ENDPOINTS.QUALIFICATION.DEPARTMENTS,
+      {
+        params: facultyId ? { facultyId } : undefined,
+      }
+    );
+    return response.data;
+  },
+
+  createDepartment: async (payload: DepartmentRequest) => {
+    const response = await qualificationApi.post<Department>(
+      API_ENDPOINTS.QUALIFICATION.DEPARTMENTS,
+      payload
+    );
+    return response.data;
+  },
+
+  getDepartmentById: async (id: string) => {
+    const response = await qualificationApi.get<Department>(
+      `${API_ENDPOINTS.QUALIFICATION.DEPARTMENTS}/${id}`
+    );
+    return response.data;
+  },
+
+  updateDepartment: async (id: string, payload: DepartmentRequest) => {
+    const response = await qualificationApi.put<Department>(
+      `${API_ENDPOINTS.QUALIFICATION.DEPARTMENTS}/${id}`,
+      payload
+    );
+    return response.data;
+  },
+
+  deleteDepartment: async (id: string) => {
+    await qualificationApi.delete(`${API_ENDPOINTS.QUALIFICATION.DEPARTMENTS}/${id}`);
   },
 
   getPrograms: async (institutionId?: string) => {

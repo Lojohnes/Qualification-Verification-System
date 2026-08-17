@@ -5,6 +5,8 @@ import com.aqvp.platform.identity.dto.AuthenticationResponse;
 import com.aqvp.platform.identity.dto.ChangePasswordRequest;
 import com.aqvp.platform.identity.dto.ForgotPasswordRequest;
 import com.aqvp.platform.identity.dto.RefreshTokenRequest;
+import com.aqvp.platform.identity.dto.RegisterRequest;
+import com.aqvp.platform.identity.dto.RegistrationStatusResponse;
 import com.aqvp.platform.identity.dto.ResetPasswordRequest;
 import com.aqvp.platform.identity.dto.UserResponseDto;
 import com.aqvp.platform.identity.service.AuthService;
@@ -12,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -44,6 +47,19 @@ public class AuthController {
     @Operation(summary = "Authenticate a user and obtain JWT tokens")
     public ResponseEntity<AuthenticationResponse> login(@Valid @RequestBody AuthenticationRequest request) {
         return ResponseEntity.ok(authService.login(request));
+    }
+
+    @PostMapping("/register")
+    @Operation(summary = "Register the first account in the system as an administrator. "
+        + "Disabled once any account already exists.")
+    public ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(request));
+    }
+
+    @GetMapping("/registration-status")
+    @Operation(summary = "Check whether public self-registration is currently available")
+    public ResponseEntity<RegistrationStatusResponse> getRegistrationStatus() {
+        return ResponseEntity.ok(authService.getRegistrationStatus());
     }
 
     @PostMapping("/logout")

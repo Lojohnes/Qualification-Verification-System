@@ -22,6 +22,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { ROUTES } from '@/constants/routes';
+import { usePermission } from '@/hooks/usePermission';
 
 const DRAWER_WIDTH = 260;
 
@@ -35,16 +36,37 @@ interface MenuItemConfig {
   path: string;
   icon: React.ReactNode;
   indent?: boolean;
+  permission?: string;
 }
 
 const menuItems: MenuItemConfig[] = [
   { label: 'Dashboard', path: ROUTES.DASHBOARD, icon: <DashboardIcon /> },
   { label: 'Identity', path: '#', icon: <ShieldIcon /> },
-  { label: 'Users', path: ROUTES.USERS, icon: <ShieldIcon />, indent: true },
-  { label: 'Roles', path: ROUTES.ROLES, icon: <ShieldIcon />, indent: true },
-  { label: 'Permissions', path: ROUTES.PERMISSIONS, icon: <ShieldIcon />, indent: true },
+  {
+    label: 'Users',
+    path: ROUTES.USERS,
+    icon: <ShieldIcon />,
+    indent: true,
+    permission: 'user:read',
+  },
+  {
+    label: 'Roles',
+    path: ROUTES.ROLES,
+    icon: <ShieldIcon />,
+    indent: true,
+    permission: 'role:read',
+  },
+  {
+    label: 'Permissions',
+    path: ROUTES.PERMISSIONS,
+    icon: <ShieldIcon />,
+    indent: true,
+    permission: 'role:read',
+  },
   { label: 'Institution', path: '#', icon: <BusinessIcon /> },
   { label: 'Institutions', path: ROUTES.INSTITUTIONS, icon: <BusinessIcon />, indent: true },
+  { label: 'Faculties', path: ROUTES.FACULTIES, icon: <BusinessIcon />, indent: true },
+  { label: 'Departments', path: ROUTES.DEPARTMENTS, icon: <BusinessIcon />, indent: true },
   { label: 'Programs', path: ROUTES.PROGRAMS, icon: <SchoolIcon />, indent: true },
   { label: 'Qualification', path: ROUTES.QUALIFICATION, icon: <SchoolIcon /> },
   { label: 'Verification', path: ROUTES.VERIFICATION, icon: <VerifiedIcon /> },
@@ -58,6 +80,16 @@ export function Sidebar({ open, onClose }: SidebarProps) {
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const { hasPermission } = usePermission();
+
+  const permissionFiltered = menuItems.filter(
+    (item) => !item.permission || hasPermission(item.permission)
+  );
+  const visibleMenuItems = permissionFiltered.filter((item, index) => {
+    if (item.path !== '#') return true;
+    const next = permissionFiltered[index + 1];
+    return !!next && next.path !== '#';
+  });
 
   const handleClick = (path: string) => {
     if (path !== '#') {
@@ -74,7 +106,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </Typography>
       </Toolbar>
       <List>
-        {menuItems.map((item) => {
+        {visibleMenuItems.map((item) => {
           const isActive =
             location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
           const isHeader = item.path === '#';

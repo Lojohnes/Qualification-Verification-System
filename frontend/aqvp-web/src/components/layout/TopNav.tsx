@@ -16,9 +16,12 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 
+import { useNavigate } from 'react-router-dom';
+
 import { useThemeContext } from '@/hooks/useThemeContext';
 import { useAuth } from '@/hooks/useAuth';
 import { useState } from 'react';
+import { ROUTES } from '@/constants/routes';
 
 interface TopNavProps {
   onMenuToggle: () => void;
@@ -28,6 +31,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
   const theme = useTheme();
   const { mode, toggleTheme } = useThemeContext();
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -36,6 +40,11 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleSettings = () => {
+    handleMenuClose();
+    navigate(ROUTES.SETTINGS);
   };
 
   const handleLogout = () => {
@@ -86,6 +95,7 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
             transformOrigin={{ vertical: 'top', horizontal: 'right' }}
           >
             <MenuItem disabled>{displayName}</MenuItem>
+            <MenuItem onClick={handleSettings}>Settings</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Box>
