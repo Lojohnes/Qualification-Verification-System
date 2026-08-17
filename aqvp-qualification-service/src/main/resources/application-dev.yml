@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${QUALIFICATION_DB_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/aqvp_db}}
+    url: ${QUALIFICATION_DB_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/aqvp_db}}?currentSchema=qualification
     username: ${QUALIFICATION_DB_USERNAME:${DATABASE_USERNAME:aqvp}}
     password: ${QUALIFICATION_DB_PASSWORD:${DATABASE_PASSWORD:aqvp}}
     driver-class-name: org.postgresql.Driver
@@ -9,6 +9,15 @@ spring:
       ddl-auto: validate
     open-in-view: false
     show-sql: true
+    properties:
+      hibernate:
+        default_schema: qualification
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: qualification
+    create-schemas: true
+    baseline-on-migrate: false
 
 server:
   port: 8082

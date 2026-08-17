@@ -24,6 +24,9 @@ class StrongPasswordValidatorTest {
     void shouldAcceptStrongPassword() {
         assertThat(validator.isValid("Password123!", context)).isTrue();
         assertThat(validator.isValid("My$ecret8", context)).isTrue();
+        assertThat(validator.isValid("Pa55word#", context)).isTrue();
+        assertThat(validator.isValid("Pa55word^", context)).isTrue();
+        assertThat(validator.isValid("Pa55word~", context)).isTrue();
     }
 
     @Test

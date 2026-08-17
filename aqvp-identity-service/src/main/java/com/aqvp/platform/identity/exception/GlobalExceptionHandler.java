@@ -61,6 +61,15 @@ public class GlobalExceptionHandler {
             .body(buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage(), request, null));
     }
 
+    @ExceptionHandler(RegistrationDisabledException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ErrorResponse> handleRegistrationDisabled(
+        RegistrationDisabledException ex, HttpServletRequest request) {
+        log.warn("Self-registration attempt rejected: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request, null));
+    }
+
     @ExceptionHandler(WeakPasswordException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleWeakPassword(

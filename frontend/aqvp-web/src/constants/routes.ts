@@ -13,6 +13,10 @@ export const ROUTES = {
   PERMISSIONS: '/identity/permissions',
 
   INSTITUTION: '/institution',
+  INSTITUTIONS: '/institution/institutions',
+  FACULTIES: '/institution/faculties',
+  DEPARTMENTS: '/institution/departments',
+  PROGRAMS: '/institution/programs',
   QUALIFICATION: '/qualification',
   VERIFICATION: '/verification',
   DOCUMENTS: '/documents',

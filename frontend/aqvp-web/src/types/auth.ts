@@ -21,6 +21,18 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface RegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+}
+
+export interface RegistrationStatusResponse {
+  available: boolean;
+}
+
 export interface ForgotPasswordRequest {
   email: string;
 }

@@ -1,6 +1,6 @@
 # Work TODO
 
-Last updated: 2026-08-14
+Last updated: 2026-08-15
 
 ## Highest Priority
 
@@ -27,7 +27,9 @@ Last updated: 2026-08-14
 | Priority | Task | Notes | Status |
 |---|---|---|---|
 | P1 | Align API base URL strategy with gateway or direct service calls. | Current default is `http://localhost:8081`. | Pending |
-| P1 | Replace business module placeholder pages with working screens as APIs land. | Institution and Qualification are the likely next frontend modules. | Pending |
+| P1 | Replace business module placeholder pages with working screens as APIs land. | Institution module (Institutions, Programs) implemented against `aqvp-qualification-service` on port `8082`. | Complete |
+| P1 | Add Faculty/Department selector to the Program form once Faculty/Department REST endpoints exist. | Backend has schema/repositories only; no controller yet. Program form currently accepts a manually entered Department UUID. | Pending |
+| P1 | Seed or grant `institution:read`, `institution:write`, `program:read`, `program:write` authorities to the default admin role in Identity. | Required for the new Institution/Program frontend screens to return data instead of 403. | Pending |
 | P2 | Add role/permission-aware navigation and action visibility. | Must use Identity authorities. | Pending |
 | P2 | Add frontend tests. | Current package scripts do not include a test runner. | Pending |
 
