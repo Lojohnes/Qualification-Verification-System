@@ -25,6 +25,8 @@ export const API_ENDPOINTS = {
     FACULTIES: '/api/v1/faculties',
     DEPARTMENTS: '/api/v1/departments',
     PROGRAMS: '/api/v1/programs',
+    STUDENTS: '/api/v1/students',
+    QUALIFICATIONS: '/api/v1/qualifications',
   },
 } as const;
 

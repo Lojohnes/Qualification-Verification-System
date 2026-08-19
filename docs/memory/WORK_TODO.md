@@ -1,6 +1,6 @@
 # Work TODO
 
-Last updated: 2026-08-15
+Last updated: 2026-08-18
 
 ## Highest Priority
 
@@ -16,7 +16,7 @@ Last updated: 2026-08-15
 | Priority | Task | Notes | Status |
 |---|---|---|---|
 | P1 | Institution module: institutions, faculties, departments, programs. | Unique institution code and tenant boundaries are core rules. | Complete |
-| P1 | Qualification module: students, qualification records, issuance, amendment, revocation. | Must preserve history; avoid permanent deletes for qualifications. | Pending |
+| P1 | Qualification module: students, qualification records, issuance, amendment, revocation. | Must preserve history; avoid permanent deletes for qualifications. | Complete |
 | P1 | Verification module: request intake, consent validation, QR verification, result tracking. | Verification must compare to authoritative server-side record. | Pending |
 | P1 | Document module: certificate templates, PDF generation, QR embedding, digital signatures, storage metadata. | Consider async processing for heavy document generation. | Pending |
 | P1 | Audit module: immutable event model and searchable audit log. | Capture actor, organization, role, action, resource, previous/new values, timestamp, IP/device where appropriate. | Pending |
@@ -27,7 +27,7 @@ Last updated: 2026-08-15
 | Priority | Task | Notes | Status |
 |---|---|---|---|
 | P1 | Align API base URL strategy with gateway or direct service calls. | Current default is `http://localhost:8081`. | Pending |
-| P1 | Replace business module placeholder pages with working screens as APIs land. | Institution module (Institutions, Programs) implemented against `aqvp-qualification-service` on port `8082`. | Complete |
+| P1 | Replace business module placeholder pages with working screens as APIs land. | Institution module (Institutions, Programs) and Qualification module (Students, Qualifications) implemented against `aqvp-qualification-service` on port `8082`. | Complete |
 | P1 | Add Faculty/Department selector to the Program form once Faculty/Department REST endpoints exist. | Backend has schema/repositories only; no controller yet. Program form currently accepts a manually entered Department UUID. | Pending |
 | P1 | Seed or grant `institution:read`, `institution:write`, `program:read`, `program:write` authorities to the default admin role in Identity. | Required for the new Institution/Program frontend screens to return data instead of 403. | Pending |
 | P2 | Add role/permission-aware navigation and action visibility. | Must use Identity authorities. | Pending |
@@ -39,7 +39,7 @@ Last updated: 2026-08-15
 |---|---|---|---|
 | P1 | Run full Maven verification in current workspace. | Especially after Java version decision. | Complete |
 | P1 | Run Identity Testcontainers migration test in Docker-capable environment. | Currently reported skipped when Docker unavailable. | Pending |
-| P1 | Add tests for any new business module before merge. | Unit, repository, controller, security, and integration tests. | Pending |
+| P1 | Add tests for any new business module before merge. | Unit, repository, controller, security, and integration tests. | Complete — Qualification module has 38 new tests across 4 test classes, all passing. |
 | P2 | Add E2E tests for issue-to-verify workflow once modules exist. | Candidate tools: Playwright or Cypress. | Pending |
 
 ## Documentation
