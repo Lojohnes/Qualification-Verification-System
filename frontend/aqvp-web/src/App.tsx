@@ -70,7 +70,7 @@ function App() {
             </Route>
             <Route
               path={ROUTES.QUALIFICATION}
-              element={<Navigate to={ROUTES.INSTITUTIONS} replace />}
+              element={<Navigate to={ROUTES.STUDENTS} replace />}
             />
             <Route
               element={<PermissionRoute permission="student:read" />}
