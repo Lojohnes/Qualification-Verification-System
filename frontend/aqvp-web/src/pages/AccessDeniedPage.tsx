@@ -1,11 +1,13 @@
-import { Container, Paper, Typography, Button } from '@mui/material';
+import { Container, Paper, Typography, Button, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 import { MESSAGES } from '@/constants/messages';
 import { ROUTES } from '@/constants/routes';
+import { useAuth } from '@/hooks/useAuth';
 
 export function AccessDeniedPage() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   return (
     <Container
@@ -28,9 +30,14 @@ export function AccessDeniedPage() {
         <Typography variant="body1" color="text.secondary" sx={{ mt: 1, mb: 3 }}>
           {MESSAGES.ACCESS_DENIED}
         </Typography>
-        <Button variant="contained" color="primary" onClick={() => navigate(ROUTES.DASHBOARD)}>
-          Back to Dashboard
-        </Button>
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Button variant="contained" color="primary" onClick={() => navigate(ROUTES.DASHBOARD)}>
+            Back to Dashboard
+          </Button>
+          <Button variant="outlined" color="primary" onClick={logout}>
+            Log In Again
+          </Button>
+        </Box>
       </Paper>
     </Container>
   );

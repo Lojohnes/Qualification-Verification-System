@@ -3,8 +3,12 @@ import {
   Box,
   Button,
   Chip,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -12,12 +16,19 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BlockIcon from '@mui/icons-material/Block';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ArticleIcon from '@mui/icons-material/Article';
+import QrCodeIcon from '@mui/icons-material/QrCode';
 
 import { DataTable } from '@/components/ui/DataTable';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { useSnackbar } from '@/hooks/useSnackbar';
-import { qualificationService } from '@/features/qualification/services/qualificationService';
+import {
+  qualificationService,
+  studentService,
+} from '@/features/qualification/services/qualificationService';
+import { institutionService } from '@/features/institution/services/institutionService';
 import { QualificationFormDialog } from '@/features/qualification/components/QualificationFormDialog';
 import {
   IssueQualificationDialog,
@@ -27,10 +38,9 @@ import type {
   Qualification,
   QualificationRequest,
   QualificationStatus,
+  Student,
 } from '@/types/qualification';
-
-// TODO: replace with institution picker / auth context when available
-const DEMO_INSTITUTION_ID = '00000000-0000-0000-0000-000000000001';
+import type { Institution, Program } from '@/types/institution';
 
 const STATUS_COLORS: Record<
   QualificationStatus,
@@ -46,6 +56,10 @@ const STATUS_COLORS: Record<
 export function QualificationsPage() {
   const { showSnackbar } = useSnackbar();
   const [qualifications, setQualifications] = useState<Qualification[]>([]);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
@@ -60,13 +74,46 @@ export function QualificationsPage() {
   const [actionSubmitting, setActionSubmitting] = useState(false);
 
   const loadQualifications = useCallback(() => {
+    if (!selectedInstitutionId) {
+      setQualifications([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     qualificationService
-      .getQualificationsByInstitution(DEMO_INSTITUTION_ID)
+      .getQualificationsByInstitution(selectedInstitutionId)
       .then(setQualifications)
       .catch(() => showSnackbar('Failed to load qualifications.', 'error'))
       .finally(() => setLoading(false));
+  }, [selectedInstitutionId, showSnackbar]);
+
+  useEffect(() => {
+    institutionService
+      .getInstitutions()
+      .then((data) => {
+        setInstitutions(data);
+        if (data.length > 0) {
+          setSelectedInstitutionId(data[0].id);
+        }
+      })
+      .catch(() => showSnackbar('Failed to load institutions.', 'error'));
   }, [showSnackbar]);
+
+  useEffect(() => {
+    if (!selectedInstitutionId) {
+      setStudents([]);
+      setPrograms([]);
+      return;
+    }
+    studentService
+      .getStudentsByInstitution(selectedInstitutionId)
+      .then(setStudents)
+      .catch(() => showSnackbar('Failed to load students.', 'error'));
+    institutionService
+      .getPrograms(selectedInstitutionId)
+      .then(setPrograms)
+      .catch(() => showSnackbar('Failed to load programs.', 'error'));
+  }, [selectedInstitutionId, showSnackbar]);
 
   useEffect(() => {
     loadQualifications();
@@ -81,6 +128,14 @@ export function QualificationsPage() {
 
   // ── CRUD handlers ────────────────────────────────────────────────────────
   const handleCreate = () => {
+    if (!selectedInstitutionId) {
+      showSnackbar('Select or create an institution first.', 'warning');
+      return;
+    }
+    if (students.length === 0) {
+      showSnackbar('Create a student for this institution first.', 'warning');
+      return;
+    }
     setEditing(null);
     setFormOpen(true);
   };
@@ -125,6 +180,45 @@ export function QualificationsPage() {
     }
   };
 
+  const openBlobInNewTab = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const handleCertificate = async (q: Qualification) => {
+    try {
+      const blob = await qualificationService.generateCertificate(q.id);
+      openBlobInNewTab(blob, `certificate-${q.qualificationNumber}.pdf`);
+    } catch {
+      showSnackbar('Failed to generate certificate.', 'error');
+    }
+  };
+
+  const handleTranscript = async (q: Qualification) => {
+    try {
+      const blob = await qualificationService.generateTranscript(q.id);
+      openBlobInNewTab(blob, `transcript-${q.qualificationNumber}.pdf`);
+    } catch {
+      showSnackbar('Failed to generate transcript.', 'error');
+    }
+  };
+
+  const handleQrCode = async (q: Qualification) => {
+    try {
+      const blob = await qualificationService.generateQrCode(q.id);
+      openBlobInNewTab(blob, `qr-${q.qualificationNumber}.png`);
+    } catch {
+      showSnackbar('Failed to generate QR code.', 'error');
+    }
+  };
+
   const handleRevoke = async (reason: string) => {
     if (!revokeTarget) return;
     setActionSubmitting(true);
@@ -146,9 +240,27 @@ export function QualificationsPage() {
         <Typography variant="h4" fontWeight={600}>
           Qualifications
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-          New Qualification
-        </Button>
+        <Box display="flex" alignItems="center" gap={2}>
+          <FormControl fullWidth sx={{ minWidth: 280 }}>
+            <InputLabel id="institution-select-label">Institution</InputLabel>
+            <Select
+              labelId="institution-select-label"
+              value={selectedInstitutionId}
+              onChange={(e) => setSelectedInstitutionId(e.target.value)}
+              label="Institution"
+              disabled={institutions.length === 0}
+            >
+              {institutions.map((inst) => (
+                <MenuItem key={inst.id} value={inst.id}>
+                  {inst.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            New Qualification
+          </Button>
+        </Box>
       </Box>
       <Box mb={2}>
         <SearchBar
@@ -226,6 +338,21 @@ export function QualificationsPage() {
                         </IconButton>
                       </Tooltip>
                     )}
+                    <Tooltip title="Certificate">
+                      <IconButton size="small" onClick={() => handleCertificate(row)} aria-label="Certificate">
+                        <PictureAsPdfIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Transcript">
+                      <IconButton size="small" onClick={() => handleTranscript(row)} aria-label="Transcript">
+                        <ArticleIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="QR Code">
+                      <IconButton size="small" onClick={() => handleQrCode(row)} aria-label="QR Code">
+                        <QrCodeIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                   </>
                 ),
               },
@@ -238,7 +365,9 @@ export function QualificationsPage() {
       <QualificationFormDialog
         open={formOpen}
         qualification={editing}
-        institutionId={DEMO_INSTITUTION_ID}
+        institutionId={selectedInstitutionId}
+        students={students}
+        programs={programs}
         submitting={submitting}
         onSubmit={handleSubmit}
         onClose={() => setFormOpen(false)}

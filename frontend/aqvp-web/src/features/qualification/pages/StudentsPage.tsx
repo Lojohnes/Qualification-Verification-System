@@ -1,5 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Box, Button, Chip, IconButton, Paper, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  Typography,
+} from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import PersonOffIcon from '@mui/icons-material/PersonOff';
@@ -10,15 +21,16 @@ import { SearchBar } from '@/components/ui/SearchBar';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { studentService } from '@/features/qualification/services/qualificationService';
+import { institutionService } from '@/features/institution/services/institutionService';
 import { StudentFormDialog } from '@/features/qualification/components/StudentFormDialog';
 import type { Student, StudentRequest } from '@/types/qualification';
-
-// TODO: replace with institution picker / auth context when available
-const DEMO_INSTITUTION_ID = '00000000-0000-0000-0000-000000000001';
+import type { Institution } from '@/types/institution';
 
 export function StudentsPage() {
   const { showSnackbar } = useSnackbar();
   const [students, setStudents] = useState<Student[]>([]);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [formOpen, setFormOpen] = useState(false);
@@ -27,12 +39,29 @@ export function StudentsPage() {
   const [deactivateTarget, setDeactivateTarget] = useState<Student | null>(null);
 
   const loadStudents = useCallback(() => {
+    if (!selectedInstitutionId) {
+      setStudents([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     studentService
-      .getStudentsByInstitution(DEMO_INSTITUTION_ID)
+      .getStudentsByInstitution(selectedInstitutionId)
       .then(setStudents)
       .catch(() => showSnackbar('Failed to load students.', 'error'))
       .finally(() => setLoading(false));
+  }, [selectedInstitutionId, showSnackbar]);
+
+  useEffect(() => {
+    institutionService
+      .getInstitutions()
+      .then((data) => {
+        setInstitutions(data);
+        if (data.length > 0) {
+          setSelectedInstitutionId(data[0].id);
+        }
+      })
+      .catch(() => showSnackbar('Failed to load institutions.', 'error'));
   }, [showSnackbar]);
 
   useEffect(() => {
@@ -47,6 +76,10 @@ export function StudentsPage() {
   );
 
   const handleCreate = () => {
+    if (!selectedInstitutionId) {
+      showSnackbar('Select or create an institution first.', 'warning');
+      return;
+    }
     setEditing(null);
     setFormOpen(true);
   };
@@ -100,9 +133,27 @@ export function StudentsPage() {
         <Typography variant="h4" fontWeight={600}>
           Students
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-          New Student
-        </Button>
+        <Box display="flex" alignItems="center" gap={2}>
+          <FormControl fullWidth sx={{ minWidth: 280 }}>
+            <InputLabel id="institution-select-label">Institution</InputLabel>
+            <Select
+              labelId="institution-select-label"
+              value={selectedInstitutionId}
+              onChange={(e) => setSelectedInstitutionId(e.target.value)}
+              label="Institution"
+              disabled={institutions.length === 0}
+            >
+              {institutions.map((inst) => (
+                <MenuItem key={inst.id} value={inst.id}>
+                  {inst.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            New Student
+          </Button>
+        </Box>
       </Box>
       <Box mb={2}>
         <SearchBar value={search} onChange={setSearch} placeholder="Search by name, number or email..." />
@@ -163,7 +214,7 @@ export function StudentsPage() {
       <StudentFormDialog
         open={formOpen}
         student={editing}
-        institutionId={DEMO_INSTITUTION_ID}
+        institutionId={selectedInstitutionId}
         submitting={submitting}
         onSubmit={handleSubmit}
         onClose={() => setFormOpen(false)}
