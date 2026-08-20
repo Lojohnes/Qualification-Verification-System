@@ -31,7 +31,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,66 +59,10 @@ public class DocumentServiceImpl implements DocumentService {
         final Qualification qualification = findQualification(qualificationId);
         final Student student = findStudent(qualification.getStudentId());
         final Institution institution = findInstitution(qualification.getInstitutionId());
-        final String programName = resolveProgramName(qualification.getProgramId());
+        final String facultyName = resolveFacultyName(qualification.getProgramId());
 
-        try (PDDocument document = new PDDocument()) {
-            final PDPage page = new PDPage(PDRectangle.A4);
-            document.addPage(page);
-            final PDPageContentStream cs = new PDPageContentStream(document, page);
-
-            float y = page.getMediaBox().getHeight() - 80;
-            final float margin = 60;
-
-            cs.setFont(PDType1Font.HELVETICA_BOLD, 22);
-            cs.beginText();
-            cs.newLineAtOffset(margin, y);
-            cs.showText("CERTIFICATE OF QUALIFICATION");
-            cs.endText();
-
-            y -= 50;
-            drawLabelValue(cs, margin, y, "This certifies that", student.getFirstName() + " " + student.getStudentNumber());
-            y -= 28;
-            drawLabelValue(cs, margin, y, "has been awarded", qualification.getQualificationName());
-            y -= 28;
-            drawLabelValue(cs, margin, y, "Qualification Number", qualification.getQualificationNumber());
-            y -= 28;
-            drawLabelValue(cs, margin, y, "Type", qualification.getQualificationType().name().replace('_', ' '));
-            y -= 28;
-            if (qualification.getClassification() != null && !qualification.getClassification().isBlank()) {
-                drawLabelValue(cs, margin, y, "Classification", qualification.getClassification());
-                y -= 28;
-            }
-            drawLabelValue(cs, margin, y, "Year of Award", String.valueOf(qualification.getYearOfAward()));
-            y -= 28;
-            drawLabelValue(cs, margin, y, "Institution", institution.getName());
-            y -= 28;
-            if (programName != null) {
-                drawLabelValue(cs, margin, y, "Program", programName);
-                y -= 28;
-            }
-            drawLabelValue(cs, margin, y, "Status", qualification.getStatus().name());
-            y -= 28;
-            if (qualification.getSecurityIdentifier() != null) {
-                drawLabelValue(cs, margin, y, "Security Identifier", qualification.getSecurityIdentifier());
-                y -= 28;
-            }
-
-            // QR code in the certificate
-            final byte[] qrBytes = buildQrImage(qualification, student, institution);
-            final PDImageXObject qrImage = PDImageXObject.createFromByteArray(document, qrBytes, "qr");
-            cs.drawImage(qrImage, margin, 80, 140, 140);
-
-            cs.setFont(PDType1Font.HELVETICA, 10);
-            cs.beginText();
-            cs.newLineAtOffset(margin, 60);
-            cs.showText("Scan the QR code to verify this qualification.");
-            cs.endText();
-
-            cs.close();
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            document.save(out);
-            return out.toByteArray();
-        }
+        final byte[] qrBytes = buildQrImage(qualification, student, institution);
+        return MsuCertificateGenerator.generate(qualification, student, institution, facultyName, qrBytes);
     }
 
     @Override
@@ -257,6 +200,13 @@ public class DocumentServiceImpl implements DocumentService {
         return Optional.ofNullable(programId)
                 .flatMap(programRepository::findById)
                 .map(Program::getName)
+                .orElse(null);
+    }
+
+    private String resolveFacultyName(UUID programId) {
+        return Optional.ofNullable(programId)
+                .flatMap(programRepository::findById)
+                .map(program -> program.getDepartment().getFaculty().getName())
                 .orElse(null);
     }
 
