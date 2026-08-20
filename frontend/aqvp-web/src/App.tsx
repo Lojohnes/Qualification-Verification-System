@@ -56,10 +56,18 @@ function App() {
               path={ROUTES.INSTITUTION}
               element={<Navigate to={ROUTES.INSTITUTIONS} replace />}
             />
-            <Route path={ROUTES.INSTITUTIONS} element={<InstitutionsPage />} />
-            <Route path={ROUTES.FACULTIES} element={<FacultiesPage />} />
-            <Route path={ROUTES.DEPARTMENTS} element={<DepartmentsPage />} />
-            <Route path={ROUTES.PROGRAMS} element={<ProgramsPage />} />
+            <Route element={<PermissionRoute permission="institution:read" />}>
+              <Route path={ROUTES.INSTITUTIONS} element={<InstitutionsPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission="faculty:read" />}>
+              <Route path={ROUTES.FACULTIES} element={<FacultiesPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission="department:read" />}>
+              <Route path={ROUTES.DEPARTMENTS} element={<DepartmentsPage />} />
+            </Route>
+            <Route element={<PermissionRoute permission="program:read" />}>
+              <Route path={ROUTES.PROGRAMS} element={<ProgramsPage />} />
+            </Route>
             <Route
               path={ROUTES.QUALIFICATION}
               element={<Navigate to={ROUTES.STUDENTS} replace />}

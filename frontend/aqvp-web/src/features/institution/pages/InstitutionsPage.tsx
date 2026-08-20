@@ -9,12 +9,15 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { usePermission } from '@/hooks/usePermission';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { institutionService } from '@/features/institution/services/institutionService';
 import { InstitutionFormDialog } from '@/features/institution/components/InstitutionFormDialog';
 import type { Institution, InstitutionRequest } from '@/types/institution';
 
 export function InstitutionsPage() {
   const { showSnackbar } = useSnackbar();
+  const { hasPermission } = usePermission();
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -90,9 +93,11 @@ export function InstitutionsPage() {
         <Typography variant="h4" fontWeight={600}>
           Institutions
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-          New Institution
-        </Button>
+        <PermissionGate permission="institution:write">
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            New Institution
+          </Button>
+        </PermissionGate>
       </Box>
       <Box mb={2}>
         <SearchBar value={search} onChange={setSearch} placeholder="Search institutions..." />
@@ -122,20 +127,23 @@ export function InstitutionsPage() {
                 key: 'actions',
                 header: 'Actions',
                 align: 'right',
-                render: (row) => (
-                  <>
-                    <IconButton size="small" onClick={() => handleEdit(row)} aria-label="Edit">
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => setDeleteTarget(row)}
-                      aria-label="Deactivate"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </>
-                ),
+                render: (row) =>
+                  hasPermission('institution:write') ? (
+                    <>
+                      <IconButton size="small" onClick={() => handleEdit(row)} aria-label="Edit">
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => setDeleteTarget(row)}
+                        aria-label="Deactivate"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </>
+                  ) : (
+                    '-'
+                  ),
               },
             ]}
           />

@@ -9,12 +9,15 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { useSnackbar } from '@/hooks/useSnackbar';
+import { usePermission } from '@/hooks/usePermission';
+import { PermissionGate } from '@/components/auth/PermissionGate';
 import { institutionService } from '@/features/institution/services/institutionService';
 import { ProgramFormDialog } from '@/features/institution/components/ProgramFormDialog';
 import type { Institution, Program, ProgramRequest } from '@/types/institution';
 
 export function ProgramsPage() {
   const { showSnackbar } = useSnackbar();
+  const { hasPermission } = usePermission();
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,9 +102,11 @@ export function ProgramsPage() {
         <Typography variant="h4" fontWeight={600}>
           Programs
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-          New Program
-        </Button>
+        <PermissionGate permission="program:write">
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            New Program
+          </Button>
+        </PermissionGate>
       </Box>
       <Box display="flex" gap={2} mb={2} flexWrap="wrap">
         <Box flexGrow={1} minWidth={240}>
@@ -154,20 +159,23 @@ export function ProgramsPage() {
                 key: 'actions',
                 header: 'Actions',
                 align: 'right',
-                render: (row) => (
-                  <>
-                    <IconButton size="small" onClick={() => handleEdit(row)} aria-label="Edit">
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      size="small"
-                      onClick={() => setDeleteTarget(row)}
-                      aria-label="Delete"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </>
-                ),
+                render: (row) =>
+                  hasPermission('program:write') ? (
+                    <>
+                      <IconButton size="small" onClick={() => handleEdit(row)} aria-label="Edit">
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => setDeleteTarget(row)}
+                        aria-label="Delete"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </>
+                  ) : (
+                    '-'
+                  ),
               },
             ]}
           />
