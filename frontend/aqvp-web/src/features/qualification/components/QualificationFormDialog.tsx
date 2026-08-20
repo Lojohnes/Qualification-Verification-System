@@ -17,8 +17,9 @@ import {
   TextField,
 } from '@mui/material';
 
-import type { Qualification, QualificationRequest, QualificationType } from '@/types/qualification';
+import type { Qualification, QualificationRequest, QualificationType, Student } from '@/types/qualification';
 import { QUALIFICATION_TYPES } from '@/types/qualification';
+import type { Program } from '@/types/institution';
 
 // Local form type: qualificationType is kept as QualificationType so the
 // yup resolver infers the correct union and satisfies react-hook-form.
@@ -54,6 +55,8 @@ interface QualificationFormDialogProps {
   qualification?: Qualification | null;
   institutionId: string;
   studentId?: string;
+  students: Student[];
+  programs: Program[];
   submitting?: boolean;
   onSubmit: (data: QualificationRequest) => void;
   onClose: () => void;
@@ -64,6 +67,8 @@ export function QualificationFormDialog({
   qualification,
   institutionId,
   studentId,
+  students,
+  programs,
   submitting,
   onSubmit,
   onClose,
@@ -106,7 +111,11 @@ export function QualificationFormDialog({
   }, [open, qualification, institutionId, studentId, reset]);
 
   const submitHandler: SubmitHandler<QualificationFormValues> = (data) => {
-    onSubmit(data as QualificationRequest);
+    const request: QualificationRequest = {
+      ...data,
+      programId: data.programId || undefined,
+    };
+    onSubmit(request);
   };
 
   const isEditingIssued =
@@ -126,15 +135,55 @@ export function QualificationFormDialog({
             error={!!errors.qualificationNumber}
             helperText={errors.qualificationNumber?.message}
           />
-          <TextField
-            {...register('studentId')}
-            label="Student ID"
-            fullWidth
-            margin="normal"
-            disabled={!!studentId || !!qualification}
-            error={!!errors.studentId}
-            helperText={errors.studentId?.message}
-          />
+          <FormControl fullWidth margin="normal" error={!!errors.studentId}>
+            <InputLabel id="student-select-label">Student</InputLabel>
+            <Controller
+              name="studentId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  labelId="student-select-label"
+                  label="Student"
+                  value={field.value || ''}
+                  disabled={!!studentId || !!qualification}
+                >
+                  {students.map((s) => (
+                    <MenuItem key={s.id} value={s.id}>
+                      {`${s.studentNumber} - ${s.firstName} ${s.lastName}`}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+            {errors.studentId && <FormHelperText>{errors.studentId?.message}</FormHelperText>}
+          </FormControl>
+
+          <FormControl fullWidth margin="normal" error={!!errors.programId}>
+            <InputLabel id="program-select-label">Program (optional)</InputLabel>
+            <Controller
+              name="programId"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  labelId="program-select-label"
+                  label="Program (optional)"
+                  value={field.value || ''}
+                >
+                  <MenuItem value="">
+                    <em>None</em>
+                  </MenuItem>
+                  {programs.map((p) => (
+                    <MenuItem key={p.id} value={p.id}>
+                      {p.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              )}
+            />
+            {errors.programId && <FormHelperText>{errors.programId?.message}</FormHelperText>}
+          </FormControl>
           <FormControl fullWidth margin="normal" error={!!errors.qualificationType} disabled={isEditingIssued}>
             <InputLabel id="qual-type-label">Qualification Type</InputLabel>
             <Controller

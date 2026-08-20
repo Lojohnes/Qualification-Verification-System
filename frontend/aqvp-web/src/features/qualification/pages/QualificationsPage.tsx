@@ -16,12 +16,18 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import BlockIcon from '@mui/icons-material/Block';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import ArticleIcon from '@mui/icons-material/Article';
+import QrCodeIcon from '@mui/icons-material/QrCode';
 
 import { DataTable } from '@/components/ui/DataTable';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { useSnackbar } from '@/hooks/useSnackbar';
-import { qualificationService } from '@/features/qualification/services/qualificationService';
+import {
+  qualificationService,
+  studentService,
+} from '@/features/qualification/services/qualificationService';
 import { institutionService } from '@/features/institution/services/institutionService';
 import { QualificationFormDialog } from '@/features/qualification/components/QualificationFormDialog';
 import {
@@ -32,8 +38,9 @@ import type {
   Qualification,
   QualificationRequest,
   QualificationStatus,
+  Student,
 } from '@/types/qualification';
-import type { Institution } from '@/types/institution';
+import type { Institution, Program } from '@/types/institution';
 
 const STATUS_COLORS: Record<
   QualificationStatus,
@@ -50,6 +57,8 @@ export function QualificationsPage() {
   const { showSnackbar } = useSnackbar();
   const [qualifications, setQualifications] = useState<Qualification[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [selectedInstitutionId, setSelectedInstitutionId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -91,6 +100,22 @@ export function QualificationsPage() {
   }, [showSnackbar]);
 
   useEffect(() => {
+    if (!selectedInstitutionId) {
+      setStudents([]);
+      setPrograms([]);
+      return;
+    }
+    studentService
+      .getStudentsByInstitution(selectedInstitutionId)
+      .then(setStudents)
+      .catch(() => showSnackbar('Failed to load students.', 'error'));
+    institutionService
+      .getPrograms(selectedInstitutionId)
+      .then(setPrograms)
+      .catch(() => showSnackbar('Failed to load programs.', 'error'));
+  }, [selectedInstitutionId, showSnackbar]);
+
+  useEffect(() => {
     loadQualifications();
   }, [loadQualifications]);
 
@@ -105,6 +130,10 @@ export function QualificationsPage() {
   const handleCreate = () => {
     if (!selectedInstitutionId) {
       showSnackbar('Select or create an institution first.', 'warning');
+      return;
+    }
+    if (students.length === 0) {
+      showSnackbar('Create a student for this institution first.', 'warning');
       return;
     }
     setEditing(null);
@@ -148,6 +177,45 @@ export function QualificationsPage() {
     } finally {
       setActionSubmitting(false);
       setIssueTarget(null);
+    }
+  };
+
+  const openBlobInNewTab = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+
+  const handleCertificate = async (q: Qualification) => {
+    try {
+      const blob = await qualificationService.generateCertificate(q.id);
+      openBlobInNewTab(blob, `certificate-${q.qualificationNumber}.pdf`);
+    } catch {
+      showSnackbar('Failed to generate certificate.', 'error');
+    }
+  };
+
+  const handleTranscript = async (q: Qualification) => {
+    try {
+      const blob = await qualificationService.generateTranscript(q.id);
+      openBlobInNewTab(blob, `transcript-${q.qualificationNumber}.pdf`);
+    } catch {
+      showSnackbar('Failed to generate transcript.', 'error');
+    }
+  };
+
+  const handleQrCode = async (q: Qualification) => {
+    try {
+      const blob = await qualificationService.generateQrCode(q.id);
+      openBlobInNewTab(blob, `qr-${q.qualificationNumber}.png`);
+    } catch {
+      showSnackbar('Failed to generate QR code.', 'error');
     }
   };
 
@@ -270,6 +338,21 @@ export function QualificationsPage() {
                         </IconButton>
                       </Tooltip>
                     )}
+                    <Tooltip title="Certificate">
+                      <IconButton size="small" onClick={() => handleCertificate(row)} aria-label="Certificate">
+                        <PictureAsPdfIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Transcript">
+                      <IconButton size="small" onClick={() => handleTranscript(row)} aria-label="Transcript">
+                        <ArticleIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="QR Code">
+                      <IconButton size="small" onClick={() => handleQrCode(row)} aria-label="QR Code">
+                        <QrCodeIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
                   </>
                 ),
               },
@@ -283,6 +366,8 @@ export function QualificationsPage() {
         open={formOpen}
         qualification={editing}
         institutionId={selectedInstitutionId}
+        students={students}
+        programs={programs}
         submitting={submitting}
         onSubmit={handleSubmit}
         onClose={() => setFormOpen(false)}

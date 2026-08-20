@@ -115,4 +115,28 @@ export const qualificationService = {
     );
     return response.data;
   },
+
+  generateCertificate: async (id: string) => {
+    const response = await qualificationApi.get<Blob>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/certificate`,
+      { responseType: 'blob' }
+    );
+    return response.data;
+  },
+
+  generateTranscript: async (id: string) => {
+    const response = await qualificationApi.get<Blob>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/transcript`,
+      { responseType: 'blob' }
+    );
+    return response.data;
+  },
+
+  generateQrCode: async (id: string) => {
+    const response = await qualificationApi.get<Blob>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/qr`,
+      { responseType: 'blob' }
+    );
+    return response.data;
+  },
 };
