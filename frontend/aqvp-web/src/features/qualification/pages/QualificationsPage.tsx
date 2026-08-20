@@ -3,8 +3,12 @@ import {
   Box,
   Button,
   Chip,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Tooltip,
   Typography,
 } from '@mui/material';
@@ -18,6 +22,7 @@ import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { useSnackbar } from '@/hooks/useSnackbar';
 import { qualificationService } from '@/features/qualification/services/qualificationService';
+import { institutionService } from '@/features/institution/services/institutionService';
 import { QualificationFormDialog } from '@/features/qualification/components/QualificationFormDialog';
 import {
   IssueQualificationDialog,
@@ -28,9 +33,7 @@ import type {
   QualificationRequest,
   QualificationStatus,
 } from '@/types/qualification';
-
-// TODO: replace with institution picker / auth context when available
-const DEMO_INSTITUTION_ID = '00000000-0000-0000-0000-000000000001';
+import type { Institution } from '@/types/institution';
 
 const STATUS_COLORS: Record<
   QualificationStatus,
@@ -46,6 +49,8 @@ const STATUS_COLORS: Record<
 export function QualificationsPage() {
   const { showSnackbar } = useSnackbar();
   const [qualifications, setQualifications] = useState<Qualification[]>([]);
+  const [institutions, setInstitutions] = useState<Institution[]>([]);
+  const [selectedInstitutionId, setSelectedInstitutionId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
@@ -60,12 +65,29 @@ export function QualificationsPage() {
   const [actionSubmitting, setActionSubmitting] = useState(false);
 
   const loadQualifications = useCallback(() => {
+    if (!selectedInstitutionId) {
+      setQualifications([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     qualificationService
-      .getQualificationsByInstitution(DEMO_INSTITUTION_ID)
+      .getQualificationsByInstitution(selectedInstitutionId)
       .then(setQualifications)
       .catch(() => showSnackbar('Failed to load qualifications.', 'error'))
       .finally(() => setLoading(false));
+  }, [selectedInstitutionId, showSnackbar]);
+
+  useEffect(() => {
+    institutionService
+      .getInstitutions()
+      .then((data) => {
+        setInstitutions(data);
+        if (data.length > 0) {
+          setSelectedInstitutionId(data[0].id);
+        }
+      })
+      .catch(() => showSnackbar('Failed to load institutions.', 'error'));
   }, [showSnackbar]);
 
   useEffect(() => {
@@ -81,6 +103,10 @@ export function QualificationsPage() {
 
   // ── CRUD handlers ────────────────────────────────────────────────────────
   const handleCreate = () => {
+    if (!selectedInstitutionId) {
+      showSnackbar('Select or create an institution first.', 'warning');
+      return;
+    }
     setEditing(null);
     setFormOpen(true);
   };
@@ -146,9 +172,27 @@ export function QualificationsPage() {
         <Typography variant="h4" fontWeight={600}>
           Qualifications
         </Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-          New Qualification
-        </Button>
+        <Box display="flex" alignItems="center" gap={2}>
+          <FormControl fullWidth sx={{ minWidth: 280 }}>
+            <InputLabel id="institution-select-label">Institution</InputLabel>
+            <Select
+              labelId="institution-select-label"
+              value={selectedInstitutionId}
+              onChange={(e) => setSelectedInstitutionId(e.target.value)}
+              label="Institution"
+              disabled={institutions.length === 0}
+            >
+              {institutions.map((inst) => (
+                <MenuItem key={inst.id} value={inst.id}>
+                  {inst.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+            New Qualification
+          </Button>
+        </Box>
       </Box>
       <Box mb={2}>
         <SearchBar
@@ -238,7 +282,7 @@ export function QualificationsPage() {
       <QualificationFormDialog
         open={formOpen}
         qualification={editing}
-        institutionId={DEMO_INSTITUTION_ID}
+        institutionId={selectedInstitutionId}
         submitting={submitting}
         onSubmit={handleSubmit}
         onClose={() => setFormOpen(false)}
