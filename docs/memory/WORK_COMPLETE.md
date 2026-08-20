@@ -1,11 +1,12 @@
 # Work Complete
 
-Last updated: 2026-08-18
+Last updated: 2026-08-20
 
 ## Completed Project Work
 
 | Date / Phase | Area | Completed Work | Evidence |
 |---|---|---|---|
+| 2026-08-20 | Backend / Verification | Implemented first Verification Engine backend slice: Identity permission seed for `verification:*` and `qualification:verify`; Qualification internal verification snapshot API; Verification service dependencies/configuration, Flyway schema, entities, repositories, DTOs, JWT security, exception handling, QR parser, consent validator, qualification lookup client, matching service, request/result services, QR APIs, and audit logging placeholder. | `V6__seed_verification_permissions.sql`, `QualificationVerificationController`, `QualificationVerificationServiceImpl`, `aqvp-verification-service/src/main/java/com/aqvp/platform/verification` |
 | 2026-08-18 | Backend / Qualification | Implemented full Qualification Module backend (S2-003, S2-004, S2-005) in `aqvp-qualification-service`: Student records CRUD (`/api/v1/students`) and Qualification lifecycle (`/api/v1/qualifications`) with issue/amend/revoke actions, `QualificationStatusHistory` audit trail, MapStruct mappers, `student:read/write` and `qualification:read/write` SecurityConfig rules. | `StudentService/Impl`, `QualificationService/Impl`, `StudentController`, `QualificationController`, DTOs, Mappers, SecurityConfig |
 | 2026-08-18 | Frontend / Qualification | Replaced the Qualification placeholder page with working Students and Qualifications screens wired to the live API. StudentsPage (list, create, edit, deactivate), QualificationsPage (list, create, edit, issue, revoke) with coloured status chips, context-sensitive action icons, permission-guarded routes, and Sidebar navigation entries. | `src/features/qualification`, `src/types/qualification.ts`, `api.ts`, `routes.ts`, `App.tsx`, `Sidebar.tsx` |
 | 2026-08-15 | Frontend / Institution | Replaced the Institution placeholder page with working Institutions and Programs screens (list, search, create, edit, deactivate/delete) wired to the live `aqvp-qualification-service` REST API. Added a second authenticated axios client (`qualificationApi`) sharing the existing token/refresh interceptor logic, new routes, and Sidebar navigation entries. | `frontend/aqvp-web/src/features/institution`, `frontend/aqvp-web/src/config/axios.ts`, `frontend/aqvp-web/src/constants/api.ts`, `frontend/aqvp-web/src/constants/routes.ts`, `App.tsx`, `Sidebar.tsx` |
@@ -21,6 +22,7 @@ Last updated: 2026-08-18
 
 | Date | Area | Result |
 |---|---|---|
+| 2026-08-20 | Verification backend tests added | Added focused unit tests for QR parsing, consent validation, matching outcomes, engine QR flow, and Qualification snapshot service. Execution blocked locally because `mvn` is not installed and no Maven wrapper exists in the repo. |
 | 2026-07-29 | Identity automated suite | 101 tests reported: 100 passed, 1 skipped because Docker was unavailable. |
 | 2026-07-29 | Static analysis | Identity report states Checkstyle and SpotBugs pass cleanly. |
 | 2026-08-13 | Identity/Build verification | 103 tests reported: 102 passed, 1 skipped because Docker was unavailable. Clean compile under JDK 21. |
