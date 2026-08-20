@@ -14,12 +14,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShieldIcon from '@mui/icons-material/Shield';
 import BusinessIcon from '@mui/icons-material/Business';
 import SchoolIcon from '@mui/icons-material/School';
-import PeopleIcon from '@mui/icons-material/People';
 import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
-import VerifiedIcon from '@mui/icons-material/Verified';
-import DescriptionIcon from '@mui/icons-material/Description';
-import HistoryIcon from '@mui/icons-material/History';
-import BarChartIcon from '@mui/icons-material/BarChart';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -65,30 +60,35 @@ const menuItems: MenuItemConfig[] = [
     indent: true,
     permission: 'role:read',
   },
-  { label: 'Institution', path: '#', icon: <BusinessIcon /> },
-  { label: 'Institutions', path: ROUTES.INSTITUTIONS, icon: <BusinessIcon />, indent: true },
-  { label: 'Faculties', path: ROUTES.FACULTIES, icon: <BusinessIcon />, indent: true },
-  { label: 'Departments', path: ROUTES.DEPARTMENTS, icon: <BusinessIcon />, indent: true },
-  { label: 'Programs', path: ROUTES.PROGRAMS, icon: <SchoolIcon />, indent: true },
-  { label: 'Qualification', path: '#', icon: <SchoolIcon /> },
+  { label: 'Qualification', path: '#', icon: <WorkspacePremiumIcon /> },
   {
-    label: 'Students',
-    path: ROUTES.STUDENTS,
-    icon: <PeopleIcon />,
+    label: 'Institutions',
+    path: ROUTES.INSTITUTIONS,
+    icon: <BusinessIcon />,
     indent: true,
-    permission: 'student:read',
+    permission: 'institution:read',
   },
   {
-    label: 'Qualifications',
-    path: ROUTES.QUALIFICATIONS,
-    icon: <WorkspacePremiumIcon />,
+    label: 'Faculties',
+    path: ROUTES.FACULTIES,
+    icon: <BusinessIcon />,
     indent: true,
-    permission: 'qualification:read',
+    permission: 'faculty:read',
   },
-  { label: 'Verification', path: ROUTES.VERIFICATION, icon: <VerifiedIcon /> },
-  { label: 'Documents', path: ROUTES.DOCUMENTS, icon: <DescriptionIcon /> },
-  { label: 'Audit', path: ROUTES.AUDIT, icon: <HistoryIcon /> },
-  { label: 'Reports', path: ROUTES.REPORTS, icon: <BarChartIcon /> },
+  {
+    label: 'Departments',
+    path: ROUTES.DEPARTMENTS,
+    icon: <BusinessIcon />,
+    indent: true,
+    permission: 'department:read',
+  },
+  {
+    label: 'Programs',
+    path: ROUTES.PROGRAMS,
+    icon: <SchoolIcon />,
+    indent: true,
+    permission: 'program:read',
+  },
   { label: 'Settings', path: ROUTES.SETTINGS, icon: <SettingsIcon /> },
 ];
 
