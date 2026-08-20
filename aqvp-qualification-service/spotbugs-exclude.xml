@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+
+    <!-- JPA entity relationship collections are managed by the JPA provider and Lombok builders -->
+    <Match>
+        <Package name="~com\.aqvp\.platform\.qualification\.domain.*"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Package name="~com\.aqvp\.platform\.qualification\.domain.*"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- Spring constructor injection stores service interfaces in final fields via Lombok.
+         Defensive copies are not applicable for Spring-managed service beans. -->
+    <Match>
+        <Class name="com.aqvp.platform.qualification.controller.DepartmentController"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.aqvp.platform.qualification.controller.FacultyController"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+
+    <!-- MapStruct-generated mapper implementations are not under our direct control -->
+    <Match>
+        <Class name="~.*MapperImpl"/>
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
+
+</FindBugsFilter>
+
+

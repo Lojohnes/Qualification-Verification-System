@@ -14,6 +14,8 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import ShieldIcon from '@mui/icons-material/Shield';
 import BusinessIcon from '@mui/icons-material/Business';
 import SchoolIcon from '@mui/icons-material/School';
+import PeopleIcon from '@mui/icons-material/People';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import DescriptionIcon from '@mui/icons-material/Description';
 import HistoryIcon from '@mui/icons-material/History';
@@ -68,7 +70,21 @@ const menuItems: MenuItemConfig[] = [
   { label: 'Faculties', path: ROUTES.FACULTIES, icon: <BusinessIcon />, indent: true },
   { label: 'Departments', path: ROUTES.DEPARTMENTS, icon: <BusinessIcon />, indent: true },
   { label: 'Programs', path: ROUTES.PROGRAMS, icon: <SchoolIcon />, indent: true },
-  { label: 'Qualification', path: ROUTES.QUALIFICATION, icon: <SchoolIcon /> },
+  { label: 'Qualification', path: '#', icon: <SchoolIcon /> },
+  {
+    label: 'Students',
+    path: ROUTES.STUDENTS,
+    icon: <PeopleIcon />,
+    indent: true,
+    permission: 'student:read',
+  },
+  {
+    label: 'Qualifications',
+    path: ROUTES.QUALIFICATIONS,
+    icon: <WorkspacePremiumIcon />,
+    indent: true,
+    permission: 'qualification:read',
+  },
   { label: 'Verification', path: ROUTES.VERIFICATION, icon: <VerifiedIcon /> },
   { label: 'Documents', path: ROUTES.DOCUMENTS, icon: <DescriptionIcon /> },
   { label: 'Audit', path: ROUTES.AUDIT, icon: <HistoryIcon /> },

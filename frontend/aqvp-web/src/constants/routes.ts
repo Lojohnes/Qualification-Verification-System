@@ -18,6 +18,8 @@ export const ROUTES = {
   DEPARTMENTS: '/institution/departments',
   PROGRAMS: '/institution/programs',
   QUALIFICATION: '/qualification',
+  STUDENTS: '/qualification/students',
+  QUALIFICATIONS: '/qualification/qualifications',
   VERIFICATION: '/verification',
   DOCUMENTS: '/documents',
   AUDIT: '/audit',

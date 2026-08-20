@@ -20,6 +20,8 @@ import { InstitutionsPage } from '@/features/institution/pages/InstitutionsPage'
 import { FacultiesPage } from '@/features/institution/pages/FacultiesPage';
 import { DepartmentsPage } from '@/features/institution/pages/DepartmentsPage';
 import { ProgramsPage } from '@/features/institution/pages/ProgramsPage';
+import { StudentsPage } from '@/features/qualification/pages/StudentsPage';
+import { QualificationsPage } from '@/features/qualification/pages/QualificationsPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { ROUTES } from '@/constants/routes';
@@ -60,8 +62,18 @@ function App() {
             <Route path={ROUTES.PROGRAMS} element={<ProgramsPage />} />
             <Route
               path={ROUTES.QUALIFICATION}
-              element={<PlaceholderPage module="Qualification" sprint="Sprint 3" />}
+              element={<Navigate to={ROUTES.STUDENTS} replace />}
             />
+            <Route
+              element={<PermissionRoute permission="student:read" />}
+            >
+              <Route path={ROUTES.STUDENTS} element={<StudentsPage />} />
+            </Route>
+            <Route
+              element={<PermissionRoute permission="qualification:read" />}
+            >
+              <Route path={ROUTES.QUALIFICATIONS} element={<QualificationsPage />} />
+            </Route>
             <Route
               path={ROUTES.VERIFICATION}
               element={<PlaceholderPage module="Verification" sprint="Sprint 4" />}

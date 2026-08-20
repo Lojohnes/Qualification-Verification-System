@@ -60,6 +60,13 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/v1/programs/**").hasAuthority("program:write")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/programs/**").hasAuthority("program:write")
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/programs/**").hasAuthority("program:write")
+                .requestMatchers(HttpMethod.GET, "/api/v1/students/**").hasAuthority("student:read")
+                .requestMatchers(HttpMethod.POST, "/api/v1/students/**").hasAuthority("student:write")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/students/**").hasAuthority("student:write")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/students/**").hasAuthority("student:write")
+                .requestMatchers(HttpMethod.GET, "/api/v1/qualifications/**").hasAuthority("qualification:read")
+                .requestMatchers(HttpMethod.POST, "/api/v1/qualifications/**").hasAuthority("qualification:write")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/qualifications/**").hasAuthority("qualification:write")
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
