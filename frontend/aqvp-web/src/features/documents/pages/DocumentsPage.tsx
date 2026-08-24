@@ -72,15 +72,9 @@ export function DocumentsPage() {
     loadQualifications();
   }, [loadQualifications]);
 
-  const openBlobInNewTab = (blob: Blob, filename: string) => {
+  const openBlobInNewTab = (blob: Blob) => {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.open(url, '_blank');
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
@@ -90,22 +84,18 @@ export function DocumentsPage() {
   ) => {
     try {
       let blob: Blob;
-      let filename: string;
       switch (type) {
         case 'certificate':
           blob = await documentService.downloadCertificate(qualification.id);
-          filename = `certificate-${qualification.qualificationNumber}.pdf`;
           break;
         case 'transcript':
           blob = await documentService.downloadTranscript(qualification.id);
-          filename = `transcript-${qualification.qualificationNumber}.pdf`;
           break;
         case 'qr':
           blob = await documentService.downloadQrCode(qualification.id);
-          filename = `qr-${qualification.qualificationNumber}.png`;
           break;
       }
-      openBlobInNewTab(blob, filename);
+      openBlobInNewTab(blob);
     } catch {
       showSnackbar(`Failed to download ${type}.`, 'error');
     }

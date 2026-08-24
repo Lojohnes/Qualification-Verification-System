@@ -19,6 +19,7 @@ import BlockIcon from '@mui/icons-material/Block';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import ArticleIcon from '@mui/icons-material/Article';
 import QrCodeIcon from '@mui/icons-material/QrCode';
+import FolderIcon from '@mui/icons-material/Folder';
 
 import { DataTable } from '@/components/ui/DataTable';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
@@ -34,6 +35,7 @@ import {
   IssueQualificationDialog,
   RevokeQualificationDialog,
 } from '@/features/qualification/components/QualificationActionDialogs';
+import { QualificationDocumentsDialog } from '@/features/qualification/components/QualificationDocumentsDialog';
 import type {
   Qualification,
   QualificationRequest,
@@ -71,6 +73,7 @@ export function QualificationsPage() {
   // action dialog state
   const [issueTarget, setIssueTarget] = useState<Qualification | null>(null);
   const [revokeTarget, setRevokeTarget] = useState<Qualification | null>(null);
+  const [documentsTarget, setDocumentsTarget] = useState<Qualification | null>(null);
   const [actionSubmitting, setActionSubmitting] = useState(false);
 
   const loadQualifications = useCallback(() => {
@@ -180,22 +183,16 @@ export function QualificationsPage() {
     }
   };
 
-  const openBlobInNewTab = (blob: Blob, filename: string) => {
+  const openBlobInNewTab = (blob: Blob) => {
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.target = '_blank';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.open(url, '_blank');
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   const handleCertificate = async (q: Qualification) => {
     try {
       const blob = await qualificationService.generateCertificate(q.id);
-      openBlobInNewTab(blob, `certificate-${q.qualificationNumber}.pdf`);
+      openBlobInNewTab(blob);
     } catch {
       showSnackbar('Failed to generate certificate.', 'error');
     }
@@ -204,7 +201,7 @@ export function QualificationsPage() {
   const handleTranscript = async (q: Qualification) => {
     try {
       const blob = await qualificationService.generateTranscript(q.id);
-      openBlobInNewTab(blob, `transcript-${q.qualificationNumber}.pdf`);
+      openBlobInNewTab(blob);
     } catch {
       showSnackbar('Failed to generate transcript.', 'error');
     }
@@ -213,7 +210,7 @@ export function QualificationsPage() {
   const handleQrCode = async (q: Qualification) => {
     try {
       const blob = await qualificationService.generateQrCode(q.id);
-      openBlobInNewTab(blob, `qr-${q.qualificationNumber}.png`);
+      openBlobInNewTab(blob);
     } catch {
       showSnackbar('Failed to generate QR code.', 'error');
     }
@@ -339,18 +336,39 @@ export function QualificationsPage() {
                       </Tooltip>
                     )}
                     <Tooltip title="Certificate">
-                      <IconButton size="small" onClick={() => handleCertificate(row)} aria-label="Certificate">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleCertificate(row)}
+                        aria-label="Certificate"
+                      >
                         <PictureAsPdfIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="Transcript">
-                      <IconButton size="small" onClick={() => handleTranscript(row)} aria-label="Transcript">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleTranscript(row)}
+                        aria-label="Transcript"
+                      >
                         <ArticleIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                     <Tooltip title="QR Code">
-                      <IconButton size="small" onClick={() => handleQrCode(row)} aria-label="QR Code">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleQrCode(row)}
+                        aria-label="QR Code"
+                      >
                         <QrCodeIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Documents">
+                      <IconButton
+                        size="small"
+                        onClick={() => setDocumentsTarget(row)}
+                        aria-label="Documents"
+                      >
+                        <FolderIcon fontSize="small" />
                       </IconButton>
                     </Tooltip>
                   </>
@@ -389,6 +407,14 @@ export function QualificationsPage() {
         submitting={actionSubmitting}
         onConfirm={handleRevoke}
         onCancel={() => setRevokeTarget(null)}
+      />
+
+      <QualificationDocumentsDialog
+        open={!!documentsTarget}
+        qualification={documentsTarget}
+        onClose={() => setDocumentsTarget(null)}
+        onError={(message) => showSnackbar(message, 'error')}
+        onSuccess={(message) => showSnackbar(message, 'success')}
       />
     </>
   );

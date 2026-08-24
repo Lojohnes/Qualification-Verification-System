@@ -48,11 +48,7 @@ export interface StudentUpdateRequest {
 export type QualificationStatus = 'DRAFT' | 'ISSUED' | 'AMENDED' | 'REVOKED' | 'WITHDRAWN';
 
 export type QualificationType =
-  | 'DEGREE'
-  | 'DIPLOMA'
-  | 'CERTIFICATE'
-  | 'PROFESSIONAL_QUALIFICATION'
-  | 'EXAMINATION_CERTIFICATE';
+  'DEGREE' | 'DIPLOMA' | 'CERTIFICATE' | 'PROFESSIONAL_QUALIFICATION' | 'EXAMINATION_CERTIFICATE';
 
 export interface QualificationStatusHistory {
   id: string;
@@ -107,6 +103,26 @@ export interface QualificationAmendRequest {
 
 export interface QualificationRevokeRequest {
   reason: string;
+}
+
+// ---------------------------------------------------------------------------
+// Qualification Documents
+// ---------------------------------------------------------------------------
+export type QualificationDocumentType = 'CERTIFICATE' | 'TRANSCRIPT' | 'QR_CODE';
+
+export interface QualificationDocument {
+  id: string;
+  qualificationId: string;
+  documentType: QualificationDocumentType;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number;
+  sha256Hash: string;
+  qrPayload: string;
+  digitalSignature: string;
+  signatureAlgorithm: string;
+  signerKeyId: string;
+  generatedAt: string;
 }
 
 export const QUALIFICATION_TYPES: { value: QualificationType; label: string }[] = [

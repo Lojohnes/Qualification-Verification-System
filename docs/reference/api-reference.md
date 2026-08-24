@@ -1,6 +1,6 @@
 # API Reference
 
-Last updated: 2026-08-20
+Last updated: 2026-08-24
 
 ## Base URLs
 
@@ -72,6 +72,41 @@ These endpoints are used by `aqvp-verification-service` to resolve authoritative
 |---|---|---|---|
 | GET | `/api/v1/internal/qualifications/verification-snapshots/by-security-identifier/{securityIdentifier}` | Read minimal authoritative snapshot for a QR/security identifier. | `qualification:verify` |
 | GET | `/api/v1/internal/qualifications/verification-snapshots/by-number/{qualificationNumber}` | Read minimal authoritative snapshot by qualification number. | `qualification:verify` |
+
+## Qualification Service Document Endpoints
+
+Generated document endpoints require `qualification:read`. A qualification must already have a `securityIdentifier`, assigned when it is issued, before verifiable documents can be generated.
+
+| Method | Path | Purpose | Required Authority |
+|---|---|---|---|
+| GET | `/api/v1/qualifications/{id}/certificate` | Generate, store, and return certificate PDF bytes inline. | `qualification:read` |
+| GET | `/api/v1/qualifications/{id}/certificate/metadata` | Generate and store a certificate PDF, returning document metadata. | `qualification:read` |
+| GET | `/api/v1/qualifications/{id}/transcript` | Generate, store, and return transcript PDF bytes inline. | `qualification:read` |
+| GET | `/api/v1/qualifications/{id}/transcript/metadata` | Generate and store a transcript PDF, returning document metadata. | `qualification:read` |
+| GET | `/api/v1/qualifications/{id}/qr` | Generate, store, and return QR PNG bytes inline. | `qualification:read` |
+| GET | `/api/v1/qualifications/{id}/qr/metadata` | Generate and store a QR PNG, returning document metadata. | `qualification:read` |
+| GET | `/api/v1/qualifications/{id}/documents` | List generated document metadata for a qualification. | `qualification:read` |
+| GET | `/api/v1/qualifications/documents/{documentId}` | Read one generated document metadata record. | `qualification:read` |
+| GET | `/api/v1/qualifications/documents/{documentId}/download` | Download stored document bytes by document id. | `qualification:read` |
+
+Document metadata response shape:
+
+```json
+{
+  "id": "45d3200a-d377-4493-929a-c3a931b5a1d9",
+  "qualificationId": "83a29aa2-8bf1-4f75-822f-f43c036fd2de",
+  "documentType": "CERTIFICATE",
+  "fileName": "certificate-MSU-BSC-2024-0001.pdf",
+  "contentType": "application/pdf",
+  "sizeBytes": 18422,
+  "sha256Hash": "<hex-sha256>",
+  "qrPayload": "AQVP:v1:MSU:<securityIdentifier>",
+  "digitalSignature": "<base64-hmac-sha256>",
+  "signatureAlgorithm": "HmacSHA256",
+  "signerKeyId": "local-dev-key",
+  "generatedAt": "2026-08-24T14:00:00"
+}
+```
 
 ## Verification Service Endpoints
 
@@ -185,4 +220,4 @@ Common statuses:
 
 ## Planned APIs
 
-Document, Audit, Notification, certificate upload/OCR verification, and frontend Verification screens are not implemented yet. Future APIs should follow `/api/v1/<plural-resource>` naming, DTO boundaries, OpenAPI annotations, pagination for list endpoints, and permission checks using Identity authorities.
+Audit, Notification, certificate upload/OCR verification, frontend Verification screens, and production document-template management are not implemented yet. Future APIs should follow `/api/v1/<plural-resource>` naming, DTO boundaries, OpenAPI annotations, pagination for list endpoints, and permission checks using Identity authorities.

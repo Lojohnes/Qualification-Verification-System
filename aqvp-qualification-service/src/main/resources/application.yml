@@ -17,3 +17,7 @@ aqvp:
   security:
     jwt:
       secret: ${JWT_SECRET:change-me-very-long-secret-key-at-least-256-bits}
+  documents:
+    storage-root: ${DOCUMENT_STORAGE_ROOT:data/documents}
+    signing-secret: ${DOCUMENT_SIGNING_SECRET:change-me-document-signing-secret-at-least-256-bits}
+    signer-key-id: ${DOCUMENT_SIGNER_KEY_ID:local-dev-key}

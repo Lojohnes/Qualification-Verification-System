@@ -1,6 +1,6 @@
 # Current State
 
-Last updated: 2026-08-20
+Last updated: 2026-08-24
 
 ## Implementation Status
 
@@ -27,6 +27,13 @@ AQVP is currently a multi-module Spring Boot and React project with completed Id
   - Qualifications can be created, issued, amended, and revoked.
   - Issued qualifications receive a `securityIdentifier` used by QR verification.
   - Internal verification snapshot endpoints expose minimal authoritative records to `aqvp-verification-service`.
+- Document Management Module (under `aqvp-qualification-service`):
+  - Generated certificates, transcripts, and QR codes now create persisted document metadata records.
+  - Certificate and transcript PDFs are generated with PDFBox; QR PNGs are generated with ZXing.
+  - QR payloads now follow the Verification Engine contract: `AQVP:v1:<issuerCode>:<securityIdentifier>`.
+  - Generated artifacts are stored through local filesystem-backed storage configured by `aqvp.documents.storage-root`.
+  - Document metadata records include content type, file name, storage key, SHA-256 hash, QR payload, HMAC signature, signer key id, and generation timestamp.
+  - Stored document metadata/list/download endpoints are available under `/api/v1/qualifications/...`.
 - Verification Engine backend slice (under `aqvp-verification-service`):
   - Flyway schema, entities, repositories, DTOs, JWT security, exception handling, QR parsing, consent validation, evidence matching, request tracking, result persistence, and QR verification APIs are implemented.
   - QR verification resolves `AQVP:v1:<issuerCode>:<securityIdentifier>` against the Qualification service internal snapshot API rather than reading the Qualification database directly.
@@ -36,6 +43,7 @@ AQVP is currently a multi-module Spring Boot and React project with completed Id
   - Protected layout, dashboard, identity pages, placeholders for future modules.
   - Axios, token storage, route guards, theme/snackbar contexts, and Redux store.
   - Institution module frontend (`frontend/aqvp-web/src/features/institution`): Institutions and Programs list/create/edit/deactivate screens wired to the live Qualification service REST API (`http://localhost:8082` by default, via `VITE_QUALIFICATION_API_BASE_URL`), using a second authenticated axios client (`qualificationApi`) that shares the existing token/refresh interceptor logic.
+  - Qualification documents UI: Qualifications now include a document-management dialog for generating certificate/transcript/QR artifacts, listing stored metadata, viewing hashes/signature summaries, and downloading stored documents.
 - Docker Compose infrastructure for PostgreSQL, Keycloak, Zookeeper, and Kafka.
 - GitHub Actions CI configured for Maven verify with static analysis.
 
@@ -47,14 +55,15 @@ AQVP is currently a multi-module Spring Boot and React project with completed Id
 - Program create/edit UI requires a Department UUID entered manually because no Faculty/Department REST endpoints exist yet to populate a selector; the schema and repositories exist but there is no controller.
 - The Institution/Program screens require the Identity-issued JWT to include `institution:read`, `institution:write`, `program:read`, and `program:write` authorities. These permissions are not present in the current Identity seed migration (`V2__seed_roles_permissions.sql`), so the default admin role must be granted them (or the migration updated) before the new screens will return data instead of `403`.
 - Verification frontend screens are still placeholders.
-- Verification support for certificate upload/OCR, holder-token consent, QR digital signatures, rate limiting, and full audit integration remains pending.
+- Full frontend lint currently reports existing Prettier issues in unrelated files; the new document UI files pass targeted ESLint and the frontend production build passes.
+- Verification support for certificate upload/OCR, holder-token consent, QR signature validation, rate limiting, and full audit integration remains pending.
 - Admin service remains a structural scaffold without domain models, migrations, controllers, or tests.
 
 ## Not Yet Implemented
 
 - CSV import for qualification records.
 - Certificate upload extraction and OCR verification.
-- Document storage, PDF certificate generation, QR generation, and digital signatures.
+- Production-grade document templates, external object storage, certificate upload/OCR, and PKI-backed digital signatures.
 - Audit event model, searchable audit trail, notification service, email/SMS providers.
 - Production deployment manifests, rollback automation, and production secrets management.
 
@@ -65,4 +74,3 @@ The implementation is a modular service-oriented Spring Boot repository rather t
 ## Current Development Phase
 
 The project is in business module implementation. The immediate priority is to compile and run the new Verification slice in a Maven-capable environment, then add controller/security/integration coverage and frontend verification screens.
-
