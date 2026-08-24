@@ -15,6 +15,7 @@ import {
   Divider,
 } from '@mui/material';
 
+import axios from 'axios';
 import { verificationService } from '@/features/verification/services/verificationService';
 import type { VerificationResultResponse } from '@/types/verification';
 
@@ -44,11 +45,19 @@ export function VerificationPage() {
           consentType: 'ATTESTED_BY_VERIFIER',
           scope: 'BASIC_DETAILS',
           grantedAt: new Date().toISOString(),
+          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          consentReference: 'MANUAL_ATTESTATION',
         },
       });
       setResult(response);
     } catch (err) {
-      setError('Verification failed. The record may not exist or the service is unavailable.');
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else if (axios.isAxiosError(err) && err.response?.data) {
+        setError(JSON.stringify(err.response.data));
+      } else {
+        setError('Verification failed. The record may not exist or the service is unavailable.');
+      }
     } finally {
       setLoading(false);
     }
@@ -81,7 +90,7 @@ export function VerificationPage() {
 
           <TextField
             fullWidth
-            label="Security Identifier / QR Payload"
+            label="QR Payload, Security Identifier, or Certificate Number"
             value={qrPayload}
             onChange={(e) => setQrPayload(e.target.value)}
             sx={{ mb: 2 }}

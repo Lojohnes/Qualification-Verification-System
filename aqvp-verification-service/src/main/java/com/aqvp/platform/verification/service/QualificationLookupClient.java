@@ -8,4 +8,6 @@ import com.aqvp.platform.verification.dto.QualificationVerificationSnapshotDto;
 public interface QualificationLookupClient {
 
     QualificationVerificationSnapshotDto findBySecurityIdentifier(String securityIdentifier);
+
+    QualificationVerificationSnapshotDto findByQualificationNumber(String qualificationNumber);
 }
