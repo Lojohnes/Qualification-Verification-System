@@ -1,7 +1,6 @@
 package com.aqvp.platform.verification.config;
 
 import com.aqvp.platform.verification.security.JwtAuthenticationFilter;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +24,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-@SuppressFBWarnings(value = {"EI_EXPOSE_REP", "EI_EXPOSE_REP2"}, justification = "Spring beans injection")
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -44,10 +42,12 @@ public class SecurityConfig {
                     "/v3/api-docs/**",
                     "/actuator/health"
                 ).permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/verification-requests/**")
+                    .hasAuthority("verification:read")
                 .requestMatchers(HttpMethod.GET, "/api/v1/verifications/**").hasAuthority("verification:read")
+                .requestMatchers(HttpMethod.POST, "/api/v1/verification-requests/**")
+                    .hasAuthority("verification:write")
                 .requestMatchers(HttpMethod.POST, "/api/v1/verifications/**").hasAuthority("verification:write")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/verifications/**").hasAuthority("verification:write")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/verifications/**").hasAuthority("verification:write")
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

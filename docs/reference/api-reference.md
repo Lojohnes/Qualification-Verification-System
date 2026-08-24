@@ -1,6 +1,6 @@
 # API Reference
 
-Last updated: 2026-08-15
+Last updated: 2026-08-20
 
 ## Base URLs
 
@@ -8,6 +8,7 @@ Current implemented services:
 
 - Identity service: `http://localhost:8081` (Swagger UI: `/swagger-ui.html`, OpenAPI JSON: `/v3/api-docs`)
 - Qualification service (Institution module): `http://localhost:8082`
+- Verification service: `http://localhost:8083`
 
 Gateway routes exist on `http://localhost:8080`, but the frontend currently defaults to direct service access: `VITE_API_BASE_URL` (default `http://localhost:8081`) for Identity and `VITE_QUALIFICATION_API_BASE_URL` (default `http://localhost:8082`) for Qualification.
 
@@ -63,6 +64,77 @@ Known mismatch:
 | PUT | `/api/v1/programs/{id}` | Update program. | `program:write` |
 | DELETE | `/api/v1/programs/{id}` | Delete program. | `program:write` |
 
+## Qualification Service Internal Verification Endpoints
+
+These endpoints are used by `aqvp-verification-service` to resolve authoritative qualification snapshots without direct database access.
+
+| Method | Path | Purpose | Required Authority |
+|---|---|---|---|
+| GET | `/api/v1/internal/qualifications/verification-snapshots/by-security-identifier/{securityIdentifier}` | Read minimal authoritative snapshot for a QR/security identifier. | `qualification:verify` |
+| GET | `/api/v1/internal/qualifications/verification-snapshots/by-number/{qualificationNumber}` | Read minimal authoritative snapshot by qualification number. | `qualification:verify` |
+
+## Verification Service Endpoints
+
+| Method | Path | Purpose | Required Authority |
+|---|---|---|---|
+| POST | `/api/v1/verification-requests` | Create a tracked verification request with optional consent/evidence. | `verification:write` |
+| GET | `/api/v1/verification-requests` | List verification requests. | `verification:read` |
+| GET | `/api/v1/verification-requests/{id}` | Read a verification request and latest result summary. | `verification:read` |
+| POST | `/api/v1/verification-requests/{id}/consent-validation` | Validate or update request consent. | `verification:write` |
+| POST | `/api/v1/verification-requests/{id}/qr-verification` | Verify a QR payload under an existing request. | `verification:write` |
+| POST | `/api/v1/verifications/qr` | Create a request and run QR verification in one call. | `verification:write` |
+| GET | `/api/v1/verifications/{resultId}` | Read a persisted verification result. | `verification:read` |
+
+Example QR verification request:
+
+```json
+{
+  "qrPayload": "AQVP:v1:MSU:83a29aa2-8bf1-4f75-822f-f43c036fd2de",
+  "purpose": "EMPLOYMENT",
+  "consent": {
+    "consentType": "ATTESTED_BY_VERIFIER",
+    "scope": "BASIC_DETAILS",
+    "grantedAt": "2026-08-20T10:30:00",
+    "expiresAt": "2026-09-19T10:30:00",
+    "consentReference": "HR-FILE-2026-0091"
+  },
+  "evidence": {
+    "holderFirstName": "Amina",
+    "holderLastName": "Dube",
+    "qualificationName": "Bachelor of Science in Computer Science",
+    "yearOfAward": 2024
+  }
+}
+```
+
+Example QR verification response:
+
+```json
+{
+  "verificationRequestId": "7f74bb0a-7e9a-4828-9487-b3caaeed7046",
+  "resultId": "d439a1c3-3eca-4db9-acb9-90e320c1bf62",
+  "outcome": "VERIFIED",
+  "confidence": "HIGH",
+  "matchScore": 100,
+  "qualification": {
+    "qualificationNumber": "MSU-BSC-2024-0001",
+    "qualificationName": "Bachelor of Science in Computer Science",
+    "qualificationType": "DEGREE",
+    "classification": "First Class",
+    "yearOfAward": 2024,
+    "status": "ISSUED",
+    "issuedAt": "2026-08-18T14:30:00",
+    "institutionName": "Midlands State University"
+  },
+  "holder": {
+    "firstName": "Amina",
+    "lastName": "Dube"
+  },
+  "matchDetails": [],
+  "verifiedAt": "2026-08-20T10:31:12"
+}
+```
+
 Known gaps:
 
 - No Faculty/Department REST endpoints exist yet. `ProgramRequestDto.departmentId` must be a valid UUID from the `departments` table; the frontend Program form currently requires this to be entered manually.
@@ -113,4 +185,4 @@ Common statuses:
 
 ## Planned APIs
 
-The Institution module (Institutions, Programs) is implemented; remaining business module APIs (Qualification records, Verification, Document, Audit, Notification) are not implemented yet. Future APIs should follow `/api/v1/<plural-resource>` naming, DTO boundaries, OpenAPI annotations, pagination for list endpoints, and permission checks using Identity authorities.
+Document, Audit, Notification, certificate upload/OCR verification, and frontend Verification screens are not implemented yet. Future APIs should follow `/api/v1/<plural-resource>` naming, DTO boundaries, OpenAPI annotations, pagination for list endpoints, and permission checks using Identity authorities.

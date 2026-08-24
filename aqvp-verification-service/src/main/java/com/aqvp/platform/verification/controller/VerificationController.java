@@ -1,51 +1,43 @@
 package com.aqvp.platform.verification.controller;
 
-import com.aqvp.platform.verification.dto.VerificationRequest;
-import com.aqvp.platform.verification.dto.VerificationResponse;
-import com.aqvp.platform.verification.service.VerificationService;
-import jakarta.servlet.http.HttpServletRequest;
+import com.aqvp.platform.verification.dto.QrVerificationRequestDto;
+import com.aqvp.platform.verification.dto.VerificationResultResponseDto;
+import com.aqvp.platform.verification.service.VerificationEngineService;
 import jakarta.validation.Valid;
 import java.security.Principal;
-import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for qualification verification workflows.
+ * REST controller for direct verification actions and results.
  */
 @RestController
 @RequestMapping("/api/v1/verifications")
 @RequiredArgsConstructor
 public class VerificationController {
 
-    private final VerificationService verificationService;
+    private final VerificationEngineService verificationEngineService;
 
-    @PostMapping
-    public ResponseEntity<VerificationResponse> verify(@Valid @RequestBody VerificationRequest request,
-                                                       Principal principal,
-                                                       HttpServletRequest httpRequest) {
-        final String username = principal != null ? principal.getName() : "anonymous";
-        final String ipAddress = extractIpAddress(httpRequest);
-        final VerificationResponse response = verificationService.verify(request, username, ipAddress);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @PostMapping("/qr")
+    public ResponseEntity<VerificationResultResponseDto> verifyQr(
+            @Valid @RequestBody QrVerificationRequestDto dto,
+            Principal principal) {
+        return ResponseEntity.ok(verificationEngineService.verifyQr(dto, principalName(principal)));
     }
 
-    @GetMapping
-    public ResponseEntity<List<VerificationResponse>> list() {
-        return ResponseEntity.status(HttpStatus.OK).body(List.of());
+    @GetMapping("/{resultId}")
+    public ResponseEntity<VerificationResultResponseDto> getResult(@PathVariable UUID resultId) {
+        return ResponseEntity.ok(verificationEngineService.getResult(resultId));
     }
 
-    private String extractIpAddress(HttpServletRequest request) {
-        final String xForwarded = request.getHeader("X-Forwarded-For");
-        if (xForwarded != null && !xForwarded.isBlank()) {
-            return xForwarded.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
+    private String principalName(Principal principal) {
+        return principal == null ? "system" : principal.getName();
     }
 }

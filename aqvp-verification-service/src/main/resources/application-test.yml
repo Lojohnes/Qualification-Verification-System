@@ -12,6 +12,8 @@ spring:
   sql:
     init:
       mode: never
+  flyway:
+    enabled: false
 
 server:
   port: 0

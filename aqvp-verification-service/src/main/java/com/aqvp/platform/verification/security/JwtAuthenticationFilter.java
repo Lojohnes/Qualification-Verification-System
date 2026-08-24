@@ -18,7 +18,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Filter that parses stateless JWT credentials and sets the SecurityContext principal and authorities.
+ * Filter that parses stateless JWT credentials and sets the SecurityContext.
  */
 @Component
 @RequiredArgsConstructor

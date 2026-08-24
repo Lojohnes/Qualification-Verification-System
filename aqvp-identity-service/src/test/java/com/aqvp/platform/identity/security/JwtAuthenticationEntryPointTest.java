@@ -1,13 +1,13 @@
 package com.aqvp.platform.identity.security;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
 
 /**
@@ -18,14 +18,17 @@ class JwtAuthenticationEntryPointTest {
     private final JwtAuthenticationEntryPoint entryPoint = new JwtAuthenticationEntryPoint();
 
     @Test
-    void shouldSendUnauthorizedError() throws IOException {
-        final HttpServletRequest request = mock(HttpServletRequest.class);
-        final HttpServletResponse response = mock(HttpServletResponse.class);
+    void shouldWriteUnauthorizedError() throws IOException {
+        final MockHttpServletRequest request = new MockHttpServletRequest();
+        final MockHttpServletResponse response = new MockHttpServletResponse();
 
-        when(request.getRequestURI()).thenReturn("/api/v1/users");
+        request.setRequestURI("/api/v1/users");
 
         entryPoint.commence(request, response, new AuthenticationException("Unauthorized") { });
 
-        verify(response).sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_UNAUTHORIZED);
+        assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(response.getContentAsString())
+                .isEqualTo("{\"status\":401,\"error\":\"Unauthorized\",\"message\":\"Full authentication is required\"}");
     }
 }

@@ -1,13 +1,24 @@
 WITH inserted_permissions AS (
     INSERT INTO permissions (id, name, resource, action, description, version)
     VALUES
-        (gen_random_uuid(), 'verification:read',  'verification', 'read',  'Read verification history', 0),
-        (gen_random_uuid(), 'verification:write', 'verification', 'write', 'Verify a qualification', 0)
+        (gen_random_uuid(), 'verification:read',  'verification', 'read',
+         'Read verification requests and results', 0),
+        (gen_random_uuid(), 'verification:write', 'verification', 'write',
+         'Create verification requests and perform verification checks', 0),
+        (gen_random_uuid(), 'verification:admin', 'verification', 'admin',
+         'Administer verification workflows', 0),
+        (gen_random_uuid(), 'qualification:verify', 'qualification', 'verify',
+         'Read internal qualification verification snapshots', 0)
     ON CONFLICT (name) DO NOTHING
     RETURNING id, name
 ), existing_permissions AS (
     SELECT id, name FROM permissions
-    WHERE name IN ('verification:read', 'verification:write')
+    WHERE name IN (
+        'verification:read',
+        'verification:write',
+        'verification:admin',
+        'qualification:verify'
+    )
 ), all_new_permissions AS (
     SELECT id, name FROM inserted_permissions
     UNION ALL
