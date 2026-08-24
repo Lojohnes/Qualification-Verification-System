@@ -14,6 +14,9 @@ server:
   port: 8083
 
 aqvp:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-me-very-long-secret-key-at-least-256-bits}
   services:
     qualification:
       base-url: ${QUALIFICATION_SERVICE_BASE_URL:http://localhost:8082}
