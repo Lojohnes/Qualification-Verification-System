@@ -3,6 +3,9 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 export const QUALIFICATION_API_BASE_URL =
   import.meta.env.VITE_QUALIFICATION_API_BASE_URL || 'http://localhost:8082';
 
+export const VERIFICATION_API_BASE_URL =
+  import.meta.env.VITE_VERIFICATION_API_BASE_URL || 'http://localhost:8083';
+
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/api/v1/auth/login',
@@ -27,6 +30,9 @@ export const API_ENDPOINTS = {
     PROGRAMS: '/api/v1/programs',
     STUDENTS: '/api/v1/students',
     QUALIFICATIONS: '/api/v1/qualifications',
+  },
+  VERIFICATION: {
+    VERIFY: '/api/v1/verifications',
   },
 } as const;
 
