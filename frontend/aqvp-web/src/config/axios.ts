@@ -1,5 +1,10 @@
 import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
-import { API_BASE_URL, API_TIMEOUT_MS, QUALIFICATION_API_BASE_URL } from '@/constants/api';
+import {
+  API_BASE_URL,
+  API_TIMEOUT_MS,
+  QUALIFICATION_API_BASE_URL,
+  VERIFICATION_API_BASE_URL,
+} from '@/constants/api';
 import { STORAGE_KEYS } from '@/constants/storage';
 import {
   clearCredentials,
@@ -126,3 +131,6 @@ export const api = createApiClient(API_BASE_URL);
 
 /** Authenticated client for the Qualification service (institutions, programs). */
 export const qualificationApi = createApiClient(QUALIFICATION_API_BASE_URL);
+
+/** Authenticated client for the Verification service. */
+export const verificationApi = createApiClient(VERIFICATION_API_BASE_URL);

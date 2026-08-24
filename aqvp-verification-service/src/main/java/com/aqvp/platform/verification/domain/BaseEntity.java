@@ -2,6 +2,7 @@ package com.aqvp.platform.verification.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -13,46 +14,50 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.UuidGenerator;
 
 /**
- * Abstract base entity providing audit and optimistic locking fields.
+ * Abstract base entity providing audit fields and optimistic locking.
  */
+@MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
 @SuperBuilder
-@MappedSuperclass
 public abstract class BaseEntity {
 
     @Id
-    @GeneratedValue
-    @UuidGenerator
-    @Column(updatable = false, nullable = false, unique = true)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Column(length = 100)
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
+    @Column(name = "created_by", length = 255)
     private String createdBy;
 
-    @Column(length = 100)
+    @Column(name = "updated_by", length = 255)
     private String updatedBy;
-
-    @Version
-    private Long version;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+        if (this.version == null) {
+            this.version = 0L;
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
     }
 }

@@ -47,6 +47,25 @@ public class RestQualificationLookupClient implements QualificationLookupClient 
         }
     }
 
+    @Override
+    public QualificationVerificationSnapshotDto findByQualificationNumber(String qualificationNumber) {
+        try {
+            return restClient.get()
+                .uri("/api/v1/internal/qualifications/verification-snapshots/by-number/{number}",
+                    qualificationNumber)
+                .headers(headers -> addAuthorization(headers, serviceToken))
+                .retrieve()
+                .body(QualificationVerificationSnapshotDto.class);
+        } catch (HttpStatusCodeException ex) {
+            if (HttpStatus.NOT_FOUND.equals(ex.getStatusCode())) {
+                throw new UpstreamNotFoundException("No authoritative qualification record found");
+            }
+            throw new UpstreamServiceException("Qualification service lookup failed", ex);
+        } catch (RuntimeException ex) {
+            throw new UpstreamServiceException("Qualification service is unavailable", ex);
+        }
+    }
+
     private void addAuthorization(HttpHeaders headers, String token) {
         if (StringUtils.hasText(token)) {
             headers.setBearerAuth(token);

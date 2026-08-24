@@ -30,6 +30,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 /**
  * Runs verification checks and persists outcomes.
@@ -49,8 +50,8 @@ public class VerificationEngineService {
 
     @Transactional
     public VerificationResultResponseDto verifyQr(QrVerificationRequestDto dto, String requesterUsername) {
-        final QrPayload payload = qrPayloadParser.parse(dto.qrPayload());
-        final String securityHash = hashingService.sha256(payload.securityIdentifier());
+        final ResolvedIdentifier resolved = resolveIdentifier(dto.qrPayload());
+        final String securityHash = hashingService.sha256(resolved.securityIdentifier());
         final String payloadHash = hashingService.sha256(dto.qrPayload());
         final CreateVerificationRequestDto requestDto = new CreateVerificationRequestDto(
             VerificationChannel.QR,
@@ -66,7 +67,7 @@ public class VerificationEngineService {
             payloadHash
         );
         final ConsentValidationResult consent = requestService.latestConsentResult(request.getId());
-        return verifyParsedQr(request, payload, dto.evidence(), consent, requesterUsername);
+        return verifyParsedQr(request, resolved.payload(), dto.evidence(), consent, requesterUsername);
     }
 
     @Transactional
@@ -239,6 +240,48 @@ public class VerificationEngineService {
             return objectMapper.readValue(json == null ? "[]" : json, new TypeReference<>() {});
         } catch (JsonProcessingException ex) {
             return List.of();
+        }
+    }
+
+    private ResolvedIdentifier resolveIdentifier(String rawInput) {
+        if (!StringUtils.hasText(rawInput)) {
+            throw new InvalidQrException("QR payload, security identifier, or certificate number is required");
+        }
+        final String trimmed = rawInput.trim();
+
+        try {
+            return new ResolvedIdentifier(qrPayloadParser.parse(trimmed), null);
+        } catch (InvalidQrException ignored) {
+            // Not a structured QR payload; try plain lookups.
+        }
+
+        try {
+            final QualificationVerificationSnapshotDto snapshot = qualificationLookupClient
+                .findBySecurityIdentifier(trimmed);
+            return new ResolvedIdentifier(
+                new QrPayload("v1", "MANUAL", snapshot.securityIdentifier()),
+                snapshot.securityIdentifier());
+        } catch (UpstreamNotFoundException ignored) {
+            // Try qualification number next.
+        }
+
+        try {
+            final QualificationVerificationSnapshotDto snapshot = qualificationLookupClient
+                .findByQualificationNumber(trimmed);
+            return new ResolvedIdentifier(
+                new QrPayload("v1", "MANUAL", snapshot.securityIdentifier()),
+                snapshot.securityIdentifier());
+        } catch (UpstreamNotFoundException e) {
+            throw new InvalidQrException(
+                "No qualification found for the provided QR payload, security identifier, or certificate number");
+        }
+    }
+
+    private record ResolvedIdentifier(QrPayload payload, String securityIdentifier) {
+        private ResolvedIdentifier {
+            if (securityIdentifier == null) {
+                securityIdentifier = payload.securityIdentifier();
+            }
         }
     }
 }
