@@ -72,10 +72,15 @@ export function DocumentsPage() {
     loadQualifications();
   }, [loadQualifications]);
 
-  const openBlobInNewTab = (blob: Blob) => {
+  const downloadBlob = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   };
 
   const handleDownload = async (
@@ -84,19 +89,25 @@ export function DocumentsPage() {
   ) => {
     try {
       let blob: Blob;
+      let filename: string;
       switch (type) {
         case 'certificate':
           blob = await documentService.downloadCertificate(qualification.id);
+          filename = `certificate-${qualification.qualificationNumber}.pdf`;
           break;
         case 'transcript':
           blob = await documentService.downloadTranscript(qualification.id);
+          filename = `transcript-${qualification.qualificationNumber}.pdf`;
           break;
         case 'qr':
           blob = await documentService.downloadQrCode(qualification.id);
+          filename = `qr-${qualification.qualificationNumber}.png`;
           break;
       }
-      openBlobInNewTab(blob);
-    } catch {
+      downloadBlob(blob, filename);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(`Document download failed (${type}):`, err);
       showSnackbar(`Failed to download ${type}.`, 'error');
     }
   };

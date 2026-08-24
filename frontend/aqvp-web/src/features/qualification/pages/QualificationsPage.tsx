@@ -183,17 +183,24 @@ export function QualificationsPage() {
     }
   };
 
-  const openBlobInNewTab = (blob: Blob) => {
+  const downloadBlob = (blob: Blob, filename: string) => {
     const url = URL.createObjectURL(blob);
-    window.open(url, '_blank');
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
   };
 
   const handleCertificate = async (q: Qualification) => {
     try {
       const blob = await qualificationService.generateCertificate(q.id);
-      openBlobInNewTab(blob);
-    } catch {
+      downloadBlob(blob, `certificate-${q.qualificationNumber}.pdf`);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Certificate generation failed:', err);
       showSnackbar('Failed to generate certificate.', 'error');
     }
   };
@@ -201,8 +208,10 @@ export function QualificationsPage() {
   const handleTranscript = async (q: Qualification) => {
     try {
       const blob = await qualificationService.generateTranscript(q.id);
-      openBlobInNewTab(blob);
-    } catch {
+      downloadBlob(blob, `transcript-${q.qualificationNumber}.pdf`);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Transcript generation failed:', err);
       showSnackbar('Failed to generate transcript.', 'error');
     }
   };
@@ -210,8 +219,10 @@ export function QualificationsPage() {
   const handleQrCode = async (q: Qualification) => {
     try {
       const blob = await qualificationService.generateQrCode(q.id);
-      openBlobInNewTab(blob);
-    } catch {
+      downloadBlob(blob, `qr-${q.qualificationNumber}.png`);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('QR code generation failed:', err);
       showSnackbar('Failed to generate QR code.', 'error');
     }
   };
