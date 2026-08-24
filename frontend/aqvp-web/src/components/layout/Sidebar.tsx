@@ -86,7 +86,7 @@ const menuItems: MenuItemConfig[] = [
     permission: 'qualification:read',
   },
   { label: 'Verification', path: ROUTES.VERIFICATION, icon: <VerifiedIcon />, permission: 'verification:read' },
-  { label: 'Documents', path: ROUTES.DOCUMENTS, icon: <DescriptionIcon /> },
+  { label: 'Documents', path: ROUTES.DOCUMENTS, icon: <DescriptionIcon />, permission: 'qualification:read' },
   { label: 'Audit', path: ROUTES.AUDIT, icon: <HistoryIcon /> },
   { label: 'Reports', path: ROUTES.REPORTS, icon: <BarChartIcon /> },
   { label: 'Settings', path: ROUTES.SETTINGS, icon: <SettingsIcon /> },

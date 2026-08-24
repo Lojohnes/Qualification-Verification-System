@@ -23,6 +23,7 @@ import { ProgramsPage } from '@/features/institution/pages/ProgramsPage';
 import { StudentsPage } from '@/features/qualification/pages/StudentsPage';
 import { QualificationsPage } from '@/features/qualification/pages/QualificationsPage';
 import { VerificationPage } from '@/features/verification/pages/VerificationPage';
+import { DocumentsPage } from '@/features/documents/pages/DocumentsPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
 import { ROUTES } from '@/constants/routes';
@@ -89,9 +90,10 @@ function App() {
               <Route path={ROUTES.VERIFICATION} element={<VerificationPage />} />
             </Route>
             <Route
-              path={ROUTES.DOCUMENTS}
-              element={<PlaceholderPage module="Documents" sprint="Sprint 4" />}
-            />
+              element={<PermissionRoute permission="qualification:read" />}
+            >
+              <Route path={ROUTES.DOCUMENTS} element={<DocumentsPage />} />
+            </Route>
             <Route
               path={ROUTES.AUDIT}
               element={<PlaceholderPage module="Audit" sprint="Sprint 5" />}
