@@ -1,13 +1,13 @@
 package com.aqvp.platform.identity.security;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.access.AccessDeniedException;
 
 /**
@@ -18,14 +18,17 @@ class JwtAccessDeniedHandlerTest {
     private final JwtAccessDeniedHandler handler = new JwtAccessDeniedHandler();
 
     @Test
-    void shouldSendForbiddenError() throws IOException {
-        final HttpServletRequest request = mock(HttpServletRequest.class);
-        final HttpServletResponse response = mock(HttpServletResponse.class);
+    void shouldWriteForbiddenError() throws IOException {
+        final MockHttpServletRequest request = new MockHttpServletRequest();
+        final MockHttpServletResponse response = new MockHttpServletResponse();
 
-        when(request.getRequestURI()).thenReturn("/api/v1/users");
+        request.setRequestURI("/api/v1/users");
 
         handler.handle(request, response, new AccessDeniedException("Forbidden"));
 
-        verify(response).sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden");
+        assertThat(response.getStatus()).isEqualTo(HttpServletResponse.SC_FORBIDDEN);
+        assertThat(response.getContentType()).isEqualTo(MediaType.APPLICATION_JSON_VALUE);
+        assertThat(response.getContentAsString())
+                .isEqualTo("{\"status\":403,\"error\":\"Forbidden\",\"message\":\"Access is denied\"}");
     }
 }

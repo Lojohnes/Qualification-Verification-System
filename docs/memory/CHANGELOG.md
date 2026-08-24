@@ -1,8 +1,19 @@
 # Changelog
 
-Last updated: 2026-08-15
+Last updated: 2026-08-20
 
 All notable project changes should be recorded here in chronological order.
+
+## 2026-08-20
+
+### Verification
+
+- Added `docs/reference/verification-engine-plan.md`, a source-grounded AQVP Verification Engine design and implementation plan covering Verification Requests, Consent Validation, QR Verification, Verification APIs, components, data flow, request/response contracts, validation rules, error handling, endpoints, assumptions, execution order, and testing.
+- Implemented the first AQVP Verification Engine backend slice in `aqvp-verification-service`, including schema migration, domain entities, repositories, DTOs, stateless JWT security, exception handling, QR payload parsing, consent validation, Qualification service lookup, evidence matching, request/result persistence, and REST endpoints for verification requests and QR verification.
+- Added secured internal Qualification snapshot endpoints in `aqvp-qualification-service` for lookup by `securityIdentifier` and qualification number.
+- Added Identity permission seed migration for `verification:read`, `verification:write`, `verification:admin`, and `qualification:verify`.
+- Added focused unit tests for QR parsing, consent validation, verification matching, QR engine flow, and Qualification verification snapshots.
+- Could not execute Maven tests locally because `mvn` is not installed and the repository has no Maven wrapper.
 
 ## 2026-08-15
 

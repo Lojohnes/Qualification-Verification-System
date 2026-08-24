@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${VERIFICATION_DB_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/aqvp_db}}
+    url: ${VERIFICATION_DB_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/aqvp_db}}?currentSchema=verification
     username: ${VERIFICATION_DB_USERNAME:${DATABASE_USERNAME:aqvp}}
     password: ${VERIFICATION_DB_PASSWORD:${DATABASE_PASSWORD:aqvp}}
     driver-class-name: org.postgresql.Driver
@@ -9,6 +9,15 @@ spring:
       ddl-auto: validate
     open-in-view: false
     show-sql: true
+    properties:
+      hibernate:
+        default_schema: verification
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: verification
+    create-schemas: true
+    baseline-on-migrate: false
 
 server:
   port: 8083
