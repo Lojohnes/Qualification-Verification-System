@@ -16,35 +16,39 @@ import {
 } from '@mui/material';
 
 import { verificationService } from '@/features/verification/services/verificationService';
-import type { VerificationResponse } from '@/types/verification';
+import type { VerificationResultResponse } from '@/types/verification';
 
 export function VerificationPage() {
-  const [identifier, setIdentifier] = useState('');
-  const [method, setMethod] = useState<'MANUAL' | 'QR_SCAN'>('MANUAL');
+  const [qrPayload, setQrPayload] = useState('');
+  const [purpose, setPurpose] = useState<'EMPLOYMENT' | 'EDUCATION' | 'IMMIGRATION' | 'OTHER'>('EMPLOYMENT');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<VerificationResponse | null>(null);
+  const [result, setResult] = useState<VerificationResultResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleVerify = async () => {
     setResult(null);
     setError(null);
 
-    const trimmed = identifier.trim();
+    const trimmed = qrPayload.trim();
     if (!trimmed) {
-      setError('Please enter a certificate number or security identifier.');
+      setError('Please enter a security identifier / QR payload.');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await verificationService.verify({
-        qualificationNumber: method === 'MANUAL' ? trimmed : undefined,
-        securityIdentifier: method === 'QR_SCAN' ? trimmed : undefined,
-        method,
+      const response = await verificationService.verifyQr({
+        qrPayload: trimmed,
+        purpose,
+        consent: {
+          consentType: 'ATTESTED_BY_VERIFIER',
+          scope: 'BASIC_DETAILS',
+          grantedAt: new Date().toISOString(),
+        },
       });
       setResult(response);
     } catch (err) {
-      setError('Verification failed. Please check the identifier and try again.');
+      setError('Verification failed. The record may not exist or the service is unavailable.');
     } finally {
       setLoading(false);
     }
@@ -59,23 +63,27 @@ export function VerificationPage() {
       <Card sx={{ maxWidth: 600, mb: 3 }}>
         <CardContent>
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel id="verification-method-label">Verification Method</InputLabel>
+            <InputLabel id="verification-purpose-label">Verification Purpose</InputLabel>
             <Select
-              labelId="verification-method-label"
-              value={method}
-              label="Verification Method"
-              onChange={(e) => setMethod(e.target.value as 'MANUAL' | 'QR_SCAN')}
+              labelId="verification-purpose-label"
+              value={purpose}
+              label="Verification Purpose"
+              onChange={(e) =>
+                setPurpose(e.target.value as 'EMPLOYMENT' | 'EDUCATION' | 'IMMIGRATION' | 'OTHER')
+              }
             >
-              <MenuItem value="MANUAL">Certificate Number</MenuItem>
-              <MenuItem value="QR_SCAN">Security Identifier / QR Code</MenuItem>
+              <MenuItem value="EMPLOYMENT">Employment</MenuItem>
+              <MenuItem value="EDUCATION">Education</MenuItem>
+              <MenuItem value="IMMIGRATION">Immigration</MenuItem>
+              <MenuItem value="OTHER">Other</MenuItem>
             </Select>
           </FormControl>
 
           <TextField
             fullWidth
-            label={method === 'MANUAL' ? 'Certificate Number' : 'Security Identifier'}
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
+            label="Security Identifier / QR Payload"
+            value={qrPayload}
+            onChange={(e) => setQrPayload(e.target.value)}
             sx={{ mb: 2 }}
           />
 
@@ -100,34 +108,60 @@ export function VerificationPage() {
         <Card sx={{ maxWidth: 600 }}>
           <CardContent>
             <Alert
-              severity={result.status === 'VERIFIED' ? 'success' : 'warning'}
+              severity={result.outcome === 'VERIFIED' ? 'success' : 'warning'}
               sx={{ mb: 2 }}
             >
-              {result.status}: {result.message}
+              {result.outcome} — Confidence: {result.confidence} (score: {result.matchScore})
             </Alert>
 
-            {result.qualificationName && (
+            {result.qualification && (
               <>
                 <Typography variant="h6" gutterBottom>
                   Qualification Details
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Name:</strong> {result.qualificationName}
+                  <strong>Name:</strong> {result.qualification.qualificationName}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Number:</strong> {result.qualificationNumber}
+                  <strong>Number:</strong> {result.qualification.qualificationNumber}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Classification:</strong> {result.classification}
+                  <strong>Type:</strong> {result.qualification.qualificationType}
                 </Typography>
                 <Typography variant="body1">
-                  <strong>Year of Award:</strong> {result.yearOfAward}
+                  <strong>Classification:</strong> {result.qualification.classification}
                 </Typography>
-                {result.issuedAt && (
+                <Typography variant="body1">
+                  <strong>Year of Award:</strong> {result.qualification.yearOfAward}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Status:</strong> {result.qualification.status}
+                </Typography>
+                {result.qualification.issuedAt && (
                   <Typography variant="body1">
-                    <strong>Issued:</strong> {result.issuedAt}
+                    <strong>Issued:</strong> {result.qualification.issuedAt}
                   </Typography>
                 )}
+                <Typography variant="body1">
+                  <strong>Institution:</strong> {result.qualification.institutionName}
+                </Typography>
+              </>
+            )}
+
+            {result.holder && (
+              <>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="h6" gutterBottom>
+                  Holder
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Name:</strong> {result.holder.firstName} {result.holder.lastName}
+                </Typography>
+              </>
+            )}
+
+            {result.verifiedAt && (
+              <>
                 <Divider sx={{ my: 2 }} />
                 <Typography variant="body2" color="text.secondary">
                   Verified at {result.verifiedAt}

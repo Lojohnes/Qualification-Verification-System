@@ -32,7 +32,8 @@ export const API_ENDPOINTS = {
     QUALIFICATIONS: '/api/v1/qualifications',
   },
   VERIFICATION: {
-    VERIFY: '/api/v1/verifications',
+    VERIFY_QR: '/api/v1/verifications/qr',
+    REQUESTS: '/api/v1/verification-requests',
   },
 } as const;
 
