@@ -1,6 +1,6 @@
 # Work TODO
 
-Last updated: 2026-08-20
+Last updated: 2026-08-24
 
 ## Highest Priority
 
@@ -18,7 +18,7 @@ Last updated: 2026-08-20
 | P1 | Institution module: institutions, faculties, departments, programs. | Unique institution code and tenant boundaries are core rules. | Complete |
 | P1 | Qualification module: students, qualification records, issuance, amendment, revocation. | Must preserve history; avoid permanent deletes for qualifications. | Complete |
 | P1 | Verification module: request intake, consent validation, QR verification, result tracking. | First backend slice implemented; still needs local/CI Maven verification, broader controller/security/integration tests, certificate upload/OCR, holder-token consent, rate limiting, and frontend screens. | In Progress |
-| P1 | Document module: certificate templates, PDF generation, QR embedding, digital signatures, storage metadata. | Consider async processing for heavy document generation. | Pending |
+| P1 | Document module: certificate templates, PDF generation, QR embedding, digital signatures, storage metadata. | Initial implementation complete in Qualification service with local storage, generated PDFs/QR PNGs, HMAC signatures, and metadata. Remaining production work: templates, external object storage, async generation, PKI signing. | In Progress |
 | P1 | Audit module: immutable event model and searchable audit log. | Capture actor, organization, role, action, resource, previous/new values, timestamp, IP/device where appropriate. | Pending |
 | P2 | Notification module: email/SMS abstraction, templates, retry logging. | Provider configuration may need mock profile for local/dev. | Pending |
 
@@ -40,7 +40,7 @@ Last updated: 2026-08-20
 | P1 | Run full Maven verification in current workspace. | Especially after Java version decision. | Complete |
 | P1 | Run Maven verification for new Verification slice. | `mvn` is unavailable in the current shell and the repo has no Maven wrapper. Run once Maven is installed or wrapper is added. | Pending |
 | P1 | Run Identity Testcontainers migration test in Docker-capable environment. | Currently reported skipped when Docker unavailable. | Pending |
-| P1 | Add tests for any new business module before merge. | Unit, repository, controller, security, and integration tests. | Complete — Qualification module has 38 new tests across 4 test classes, all passing. |
+| P1 | Add tests for any new business module before merge. | Unit, repository, controller, security, and integration tests. | Complete — Qualification service now has 61 passing tests including the Document module slice. |
 | P2 | Add E2E tests for issue-to-verify workflow once modules exist. | Candidate tools: Playwright or Cypress. | Pending |
 
 ## Documentation

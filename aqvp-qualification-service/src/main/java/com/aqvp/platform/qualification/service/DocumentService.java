@@ -1,5 +1,8 @@
 package com.aqvp.platform.qualification.service;
 
+import com.aqvp.platform.qualification.dto.DocumentFileDto;
+import com.aqvp.platform.qualification.dto.DocumentResponseDto;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -12,4 +15,16 @@ public interface DocumentService {
     byte[] generateTranscript(UUID qualificationId);
 
     byte[] generateQrCode(UUID qualificationId);
+
+    DocumentResponseDto generateCertificateDocument(UUID qualificationId);
+
+    DocumentResponseDto generateTranscriptDocument(UUID qualificationId);
+
+    DocumentResponseDto generateQrCodeDocument(UUID qualificationId);
+
+    List<DocumentResponseDto> getDocumentsForQualification(UUID qualificationId);
+
+    DocumentResponseDto getDocument(UUID documentId);
+
+    DocumentFileDto getDocumentFile(UUID documentId);
 }

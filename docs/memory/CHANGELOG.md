@@ -1,8 +1,24 @@
 # Changelog
 
-Last updated: 2026-08-20
+Last updated: 2026-08-24
 
 All notable project changes should be recorded here in chronological order.
+
+## 2026-08-24
+
+### Document Management
+
+- Implemented the first Document Management backend slice in `aqvp-qualification-service`.
+- Added `qualification_documents` migration and JPA metadata model for generated certificates, transcripts, and QR codes.
+- Added local filesystem document storage with configurable `aqvp.documents.storage-root`.
+- Updated certificate/transcript/QR generation so generated artifacts are persisted with file name, content type, size, SHA-256 hash, QR payload, detached HMAC signature, signer key id, and generated timestamp.
+- Aligned generated QR payloads to the Verification Engine contract: `AQVP:v1:<issuerCode>:<securityIdentifier>`.
+- Added document metadata/list/download endpoints under `/api/v1/qualifications`.
+- Added a Qualification Documents dialog in the React app to generate stored certificate/transcript/QR artifacts, list document metadata, inspect hash/signature summaries, and download stored files.
+- Added focused document service/controller tests.
+- Verified `mvn -pl aqvp-qualification-service -am test`: 61 tests passed.
+- Verified `mvn -pl aqvp-qualification-service -am -DskipTests verify`: packaging and SpotBugs passed with zero warnings.
+- Verified `npm run build` for `frontend/aqvp-web`; targeted ESLint on touched document UI files passed. Full frontend lint still reports existing Prettier violations outside the document UI changes.
 
 ## 2026-08-20
 

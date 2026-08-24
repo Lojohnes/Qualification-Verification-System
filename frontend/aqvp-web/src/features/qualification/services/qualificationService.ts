@@ -3,6 +3,7 @@ import { API_ENDPOINTS } from '@/constants/api';
 import type {
   Qualification,
   QualificationAmendRequest,
+  QualificationDocument,
   QualificationIssueRequest,
   QualificationRequest,
   QualificationRevokeRequest,
@@ -135,6 +136,49 @@ export const qualificationService = {
   generateQrCode: async (id: string) => {
     const response = await qualificationApi.get<Blob>(
       `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/qr`,
+      { responseType: 'blob' }
+    );
+    return response.data;
+  },
+
+  generateCertificateMetadata: async (id: string) => {
+    const response = await qualificationApi.get<QualificationDocument>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/certificate/metadata`
+    );
+    return response.data;
+  },
+
+  generateTranscriptMetadata: async (id: string) => {
+    const response = await qualificationApi.get<QualificationDocument>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/transcript/metadata`
+    );
+    return response.data;
+  },
+
+  generateQrCodeMetadata: async (id: string) => {
+    const response = await qualificationApi.get<QualificationDocument>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/qr/metadata`
+    );
+    return response.data;
+  },
+
+  getDocuments: async (id: string) => {
+    const response = await qualificationApi.get<QualificationDocument[]>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/${id}/documents`
+    );
+    return response.data;
+  },
+
+  getDocument: async (documentId: string) => {
+    const response = await qualificationApi.get<QualificationDocument>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/documents/${documentId}`
+    );
+    return response.data;
+  },
+
+  downloadDocument: async (documentId: string) => {
+    const response = await qualificationApi.get<Blob>(
+      `${API_ENDPOINTS.QUALIFICATION.QUALIFICATIONS}/documents/${documentId}/download`,
       { responseType: 'blob' }
     );
     return response.data;
