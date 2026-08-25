@@ -6,6 +6,8 @@ import com.aqvp.platform.verification.exception.UpstreamServiceException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -34,7 +36,7 @@ public class RestQualificationLookupClient implements QualificationLookupClient 
             return restClient.get()
                 .uri("/api/v1/internal/qualifications/verification-snapshots/by-security-identifier/{id}",
                     securityIdentifier)
-                .headers(headers -> addAuthorization(headers, serviceToken))
+                .headers(headers -> addAuthorization(headers, resolveToken()))
                 .retrieve()
                 .body(QualificationVerificationSnapshotDto.class);
         } catch (HttpStatusCodeException ex) {
@@ -53,7 +55,7 @@ public class RestQualificationLookupClient implements QualificationLookupClient 
             return restClient.get()
                 .uri("/api/v1/internal/qualifications/verification-snapshots/by-number/{number}",
                     qualificationNumber)
-                .headers(headers -> addAuthorization(headers, serviceToken))
+                .headers(headers -> addAuthorization(headers, resolveToken()))
                 .retrieve()
                 .body(QualificationVerificationSnapshotDto.class);
         } catch (HttpStatusCodeException ex) {
@@ -64,6 +66,16 @@ public class RestQualificationLookupClient implements QualificationLookupClient 
         } catch (RuntimeException ex) {
             throw new UpstreamServiceException("Qualification service is unavailable", ex);
         }
+    }
+
+    private String resolveToken() {
+        if (StringUtils.hasText(serviceToken)) {
+            return serviceToken;
+        }
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication == null || !(authentication.getCredentials() instanceof String token)
+            ? null
+            : token;
     }
 
     private void addAuthorization(HttpHeaders headers, String token) {

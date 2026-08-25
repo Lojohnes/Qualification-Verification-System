@@ -38,6 +38,7 @@ public class QualificationServiceImpl implements QualificationService {
     private final QualificationStatusHistoryRepository statusHistoryRepository;
     private final StudentRepository studentRepository;
     private final QualificationMapper qualificationMapper;
+    private final AuditEventPublisher auditEventPublisher;
 
     @Override
     @Transactional
@@ -53,6 +54,8 @@ public class QualificationServiceImpl implements QualificationService {
         final Qualification qualification = qualificationMapper.toEntity(dto);
         qualification.setStatus(QualificationStatus.DRAFT);
         final Qualification saved = qualificationRepository.save(qualification);
+        auditEventPublisher.publish("qualification.created", "CREATE", "qualification", saved.getId(),
+            saved.getQualificationNumber(), null, "{\"status\":\"DRAFT\"}");
         return qualificationMapper.toResponseDto(saved);
     }
 
@@ -69,6 +72,8 @@ public class QualificationServiceImpl implements QualificationService {
         validateQualificationType(dto.qualificationType());
         qualificationMapper.updateEntity(dto, qualification);
         final Qualification updated = qualificationRepository.save(qualification);
+        auditEventPublisher.publish("qualification.updated", "UPDATE", "qualification", updated.getId(),
+            updated.getQualificationNumber(), null, "{\"status\":\"" + updated.getStatus() + "\"}");
         return qualificationMapper.toResponseDto(updated);
     }
 
@@ -110,7 +115,10 @@ public class QualificationServiceImpl implements QualificationService {
         }
 
         appendHistory(qualification, previousStatus, QualificationStatus.ISSUED.name(), issuedBy, null);
-        return qualificationMapper.toResponseDto(qualificationRepository.save(qualification));
+        final Qualification issued = qualificationRepository.save(qualification);
+        auditEventPublisher.publish("qualification.issued", "ISSUE", "qualification", issued.getId(),
+            issued.getQualificationNumber(), "{\"status\":\"" + previousStatus + "\"}", "{\"status\":\"ISSUED\"}");
+        return qualificationMapper.toResponseDto(issued);
     }
 
     @Override
@@ -134,7 +142,10 @@ public class QualificationServiceImpl implements QualificationService {
         }
 
         appendHistory(qualification, previousStatus, QualificationStatus.AMENDED.name(), amendedBy, dto.reason());
-        return qualificationMapper.toResponseDto(qualificationRepository.save(qualification));
+        final Qualification amended = qualificationRepository.save(qualification);
+        auditEventPublisher.publish("qualification.amended", "AMEND", "qualification", amended.getId(),
+            amended.getQualificationNumber(), "{\"status\":\"" + previousStatus + "\"}", "{\"status\":\"AMENDED\"}");
+        return qualificationMapper.toResponseDto(amended);
     }
 
     @Override
@@ -156,7 +167,10 @@ public class QualificationServiceImpl implements QualificationService {
         qualification.setRevocationReason(dto.reason());
 
         appendHistory(qualification, previousStatus, QualificationStatus.REVOKED.name(), revokedBy, dto.reason());
-        return qualificationMapper.toResponseDto(qualificationRepository.save(qualification));
+        final Qualification revoked = qualificationRepository.save(qualification);
+        auditEventPublisher.publish("qualification.revoked", "REVOKE", "qualification", revoked.getId(),
+            revoked.getQualificationNumber(), "{\"status\":\"" + previousStatus + "\"}", "{\"status\":\"REVOKED\"}");
+        return qualificationMapper.toResponseDto(revoked);
     }
 
     // -------------------------------------------------------------------------

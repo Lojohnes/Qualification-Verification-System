@@ -69,8 +69,8 @@ export function TopNav({ onMenuToggle }: TopNavProps) {
 
         <Box display="flex" alignItems="center" gap={1}>
           <Tooltip title="Notifications">
-            <IconButton color="inherit">
-              <Badge badgeContent={3} color="error">
+            <IconButton color="inherit" onClick={() => navigate(ROUTES.NOTIFICATIONS)}>
+              <Badge color="error">
                 <NotificationsIcon />
               </Badge>
             </IconButton>

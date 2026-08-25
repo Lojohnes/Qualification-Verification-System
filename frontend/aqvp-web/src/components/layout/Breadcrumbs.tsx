@@ -13,6 +13,7 @@ const routeLabels: Record<string, string> = {
   [ROUTES.VERIFICATION]: 'Verification',
   [ROUTES.DOCUMENTS]: 'Documents',
   [ROUTES.AUDIT]: 'Audit',
+  [ROUTES.NOTIFICATIONS]: 'Notifications',
   [ROUTES.REPORTS]: 'Reports',
   [ROUTES.SETTINGS]: 'Settings',
 };

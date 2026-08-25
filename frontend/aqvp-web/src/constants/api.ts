@@ -6,6 +6,9 @@ export const QUALIFICATION_API_BASE_URL =
 export const VERIFICATION_API_BASE_URL =
   import.meta.env.VITE_VERIFICATION_API_BASE_URL || 'http://localhost:8083';
 
+export const ADMIN_API_BASE_URL =
+  import.meta.env.VITE_ADMIN_API_BASE_URL || 'http://localhost:8084';
+
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/api/v1/auth/login',
@@ -34,6 +37,10 @@ export const API_ENDPOINTS = {
   VERIFICATION: {
     VERIFY_QR: '/api/v1/verifications/qr',
     REQUESTS: '/api/v1/verification-requests',
+  },
+  ADMIN: {
+    AUDIT_EVENTS: '/api/v1/admin/audit-events',
+    NOTIFICATIONS: '/api/v1/admin/notifications',
   },
 } as const;
 

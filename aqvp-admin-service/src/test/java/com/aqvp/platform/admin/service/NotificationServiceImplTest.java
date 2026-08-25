@@ -11,7 +11,9 @@ import com.aqvp.platform.admin.domain.NotificationChannel;
 import com.aqvp.platform.admin.domain.NotificationStatus;
 import com.aqvp.platform.admin.repository.NotificationRepository;
 import com.aqvp.platform.admin.service.provider.NotificationProvider;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -26,6 +28,9 @@ class NotificationServiceImplTest {
 
     @Mock
     private NotificationProvider notificationProvider;
+
+    @Mock
+    private List<NotificationProvider> notificationProviders;
 
     @InjectMocks
     private NotificationServiceImpl notificationService;
@@ -43,7 +48,9 @@ class NotificationServiceImplTest {
             .build();
 
         when(notificationRepository.save(any(Notification.class))).thenReturn(notification);
+        when(notificationProvider.supports(NotificationChannel.EMAIL)).thenReturn(true);
         when(notificationProvider.send(any(Notification.class))).thenReturn(true);
+        when(notificationProviders.stream()).thenReturn(Stream.of(notificationProvider));
 
         final Notification result = notificationService.sendNotification(
             "qualification-issued",

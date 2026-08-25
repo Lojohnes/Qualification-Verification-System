@@ -26,6 +26,8 @@ import { VerificationPage } from '@/features/verification/pages/VerificationPage
 import { DocumentsPage } from '@/features/documents/pages/DocumentsPage';
 import { SettingsPage } from '@/features/settings/pages/SettingsPage';
 import { PlaceholderPage } from '@/pages/PlaceholderPage';
+import { AuditPage } from '@/features/audit/pages/AuditPage';
+import { NotificationsPage } from '@/features/notifications/pages/NotificationsPage';
 import { ROUTES } from '@/constants/routes';
 
 function App() {
@@ -94,10 +96,8 @@ function App() {
             >
               <Route path={ROUTES.DOCUMENTS} element={<DocumentsPage />} />
             </Route>
-            <Route
-              path={ROUTES.AUDIT}
-              element={<PlaceholderPage module="Audit" sprint="Sprint 5" />}
-            />
+            <Route path={ROUTES.AUDIT} element={<AuditPage />} />
+            <Route path={ROUTES.NOTIFICATIONS} element={<NotificationsPage />} />
             <Route
               path={ROUTES.REPORTS}
               element={<PlaceholderPage module="Reports" sprint="Sprint 5" />}

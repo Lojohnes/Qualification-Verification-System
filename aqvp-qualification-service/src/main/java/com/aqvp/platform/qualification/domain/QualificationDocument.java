@@ -39,7 +39,7 @@ public class QualificationDocument extends BaseEntity {
     @Column(nullable = false, length = 500)
     private String storageKey;
 
-    @Column(nullable = false, length = 64)
+    @Column(name = "sha256_hash", nullable = false, length = 64)
     private String sha256Hash;
 
     @Column(nullable = false)

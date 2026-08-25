@@ -2,6 +2,7 @@ import axios, { type AxiosError, type AxiosInstance, type InternalAxiosRequestCo
 import {
   API_BASE_URL,
   API_TIMEOUT_MS,
+  ADMIN_API_BASE_URL,
   QUALIFICATION_API_BASE_URL,
   VERIFICATION_API_BASE_URL,
 } from '@/constants/api';
@@ -134,3 +135,6 @@ export const qualificationApi = createApiClient(QUALIFICATION_API_BASE_URL);
 
 /** Authenticated client for the Verification service. */
 export const verificationApi = createApiClient(VERIFICATION_API_BASE_URL);
+
+/** Authenticated client for the Admin service (audit and notifications). */
+export const adminApi = createApiClient(ADMIN_API_BASE_URL);
