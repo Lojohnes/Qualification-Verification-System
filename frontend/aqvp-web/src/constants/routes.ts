@@ -23,6 +23,7 @@ export const ROUTES = {
   VERIFICATION: '/verification',
   DOCUMENTS: '/documents',
   AUDIT: '/audit',
+  NOTIFICATIONS: '/notifications',
   REPORTS: '/reports',
   SETTINGS: '/settings',
 } as const;

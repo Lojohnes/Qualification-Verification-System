@@ -51,10 +51,14 @@ public final class MsuCertificateGenerator {
             cs.stroke();
 
             final float margin = 60;
+            final byte[] logoBytes = loadInstitutionLogo(institution.getCode());
+            final PDImageXObject institutionLogo = logoBytes == null
+                    ? null
+                    : PDImageXObject.createFromByteArray(document, logoBytes, "institution-logo");
 
             // top corner crests
-            drawCrest(cs, 70, pageHeight - 95);
-            drawCrest(cs, pageWidth - 110, pageHeight - 95);
+            drawCrest(cs, 70, pageHeight - 95, institutionLogo);
+            drawCrest(cs, pageWidth - 110, pageHeight - 95, institutionLogo);
 
             // institution name
             final String institutionName = institution.getName().toUpperCase();
@@ -62,10 +66,15 @@ public final class MsuCertificateGenerator {
 
             // coat of arms placeholder
             final float coatOfArmsY = pageHeight - 170;
-            drawCoatOfArmsPlaceholder(cs, pageWidth / 2, coatOfArmsY, 60);
+            final float facultyY = coatOfArmsY - 35;
+            final float logoCenterY = (pageHeight - 85 + facultyY) / 2;
+            if (institutionLogo != null) {
+                cs.drawImage(institutionLogo, pageWidth / 2 - 55, logoCenterY - 40, 110, 80);
+            } else {
+                drawCoatOfArmsPlaceholder(cs, pageWidth / 2, logoCenterY, 60);
+            }
 
             // faculty
-            final float facultyY = coatOfArmsY - 35;
             final String facultyText = (facultyName != null && !facultyName.isBlank())
                     ? "FACULTY OF " + facultyName.toUpperCase()
                     : "FACULTY";
@@ -115,13 +124,30 @@ public final class MsuCertificateGenerator {
 
             // QR code bottom left
             final PDImageXObject qrImage = PDImageXObject.createFromByteArray(document, qrBytes, "qr");
-            cs.drawImage(qrImage, margin, 55, 100, 100);
+            cs.drawImage(qrImage, pageWidth - margin - 100, degreeY - 20, 100, 100);
 
             cs.close();
             final ByteArrayOutputStream out = new ByteArrayOutputStream();
             document.save(out);
             return out.toByteArray();
         }
+    }
+
+    @SneakyThrows
+    private static byte[] loadInstitutionLogo(String institutionCode) {
+        if (institutionCode == null || institutionCode.isBlank()) {
+            return null;
+        }
+        final String logoName = institutionCode.trim().toUpperCase();
+        for (final String extension : new String[] {".png", ".jpg", ".jpeg", ".gif"}) {
+            final String resourcePath = "/logos/" + logoName + extension;
+            try (java.io.InputStream stream = MsuCertificateGenerator.class.getResourceAsStream(resourcePath)) {
+                if (stream != null) {
+                    return stream.readAllBytes();
+                }
+            }
+        }
+        return null;
     }
 
     private static String defaultIfNull(String value, String fallback) {
@@ -202,8 +228,16 @@ public final class MsuCertificateGenerator {
     }
 
     @SneakyThrows
-    private static void drawCrest(PDPageContentStream cs, float x, float y) {
+    private static void drawCrest(PDPageContentStream cs, float x, float y, PDImageXObject logo) {
         final float size = 45;
+        if (logo != null) {
+            final float scale = Math.min(size / logo.getWidth(), size / logo.getHeight());
+            final float width = logo.getWidth() * scale;
+            final float height = logo.getHeight() * scale;
+            cs.drawImage(logo, x + (size - width) / 2, y + (size - height) / 2, width, height);
+            return;
+        }
+
         cs.setLineWidth(0.8f);
         cs.setStrokingColor(0, 0, 0);
         cs.addRect(x, y, size, size);

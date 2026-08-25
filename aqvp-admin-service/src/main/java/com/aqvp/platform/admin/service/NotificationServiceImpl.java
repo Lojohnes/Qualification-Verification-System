@@ -6,6 +6,7 @@ import com.aqvp.platform.admin.domain.NotificationStatus;
 import com.aqvp.platform.admin.repository.NotificationRepository;
 import com.aqvp.platform.admin.service.provider.NotificationProvider;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificationServiceImpl implements NotificationService {
 
     private final NotificationRepository notificationRepository;
-    private final NotificationProvider notificationProvider;
+    private final List<NotificationProvider> notificationProviders;
 
     @Override
     @Transactional
@@ -39,7 +40,11 @@ public class NotificationServiceImpl implements NotificationService {
         final Notification saved = notificationRepository.save(notification);
 
         try {
-            final boolean delivered = notificationProvider.send(saved);
+            final NotificationProvider provider = notificationProviders.stream()
+                .filter(candidate -> candidate.supports(channel))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No provider configured for channel " + channel));
+            final boolean delivered = provider.send(saved);
             saved.setStatus(delivered ? NotificationStatus.SENT : NotificationStatus.FAILED);
             saved.setSentAt(LocalDateTime.now());
             saved.setAttempts(saved.getAttempts() == null ? 1 : saved.getAttempts() + 1);

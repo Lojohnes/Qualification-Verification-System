@@ -21,6 +21,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import HistoryIcon from '@mui/icons-material/History';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import SettingsIcon from '@mui/icons-material/Settings';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { ROUTES } from '@/constants/routes';
@@ -87,8 +88,9 @@ const menuItems: MenuItemConfig[] = [
   },
   { label: 'Verification', path: ROUTES.VERIFICATION, icon: <VerifiedIcon />, permission: 'verification:read' },
   { label: 'Documents', path: ROUTES.DOCUMENTS, icon: <DescriptionIcon />, permission: 'qualification:read' },
-  { label: 'Audit', path: ROUTES.AUDIT, icon: <HistoryIcon /> },
-  { label: 'Reports', path: ROUTES.REPORTS, icon: <BarChartIcon /> },
+  { label: 'Reports', path: '#', icon: <BarChartIcon /> },
+  { label: 'Audit', path: ROUTES.AUDIT, icon: <HistoryIcon />, indent: true },
+  { label: 'Notifications', path: ROUTES.NOTIFICATIONS, icon: <NotificationsIcon />, indent: true },
   { label: 'Settings', path: ROUTES.SETTINGS, icon: <SettingsIcon /> },
 ];
 

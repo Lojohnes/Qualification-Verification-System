@@ -1,6 +1,5 @@
-package com.aqvp.platform.verification.service;
+package com.aqvp.platform.qualification.service;
 
-import com.aqvp.platform.verification.domain.VerificationOutcome;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -12,9 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-/**
- * Placeholder audit publisher until the Admin/Audit module is implemented.
- */
 @Component
 @Slf4j
 public class AuditEventPublisher {
@@ -26,16 +22,18 @@ public class AuditEventPublisher {
         this.restClient = builder.baseUrl(baseUrl).build();
     }
 
-    public void verificationCompleted(UUID requestId, VerificationOutcome outcome) {
+    public void publish(String eventType, String action, String resourceType, UUID resourceId,
+                        String resourceName, String previousValues, String newValues) {
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final Map<String, Object> event = new LinkedHashMap<>();
-        event.put("eventType", "verification.completed");
-        event.put("action", "VERIFY");
+        event.put("eventType", eventType);
+        event.put("action", action);
         event.put("actorName", authentication == null ? "system" : authentication.getName());
-        event.put("resourceType", "verification");
-        event.put("resourceId", requestId);
-        event.put("resourceName", requestId.toString());
-        event.put("newValues", "{\"outcome\":\"" + outcome + "\"}");
+        event.put("resourceType", resourceType);
+        event.put("resourceId", resourceId);
+        event.put("resourceName", resourceName);
+        event.put("previousValues", previousValues);
+        event.put("newValues", newValues);
         final Object credentials = authentication == null ? null : authentication.getCredentials();
         try {
             restClient.post()
@@ -50,7 +48,7 @@ public class AuditEventPublisher {
                 .retrieve()
                 .toBodilessEntity();
         } catch (RuntimeException ex) {
-            log.warn("Could not publish verification audit event requestId={}: {}", requestId, ex.getMessage());
+            log.warn("Could not publish audit event type={} action={}: {}", eventType, action, ex.getMessage());
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.aqvp.platform.qualification.security;
+package com.aqvp.platform.admin.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,9 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/**
- * Filter that parses stateless JWT credentials and sets the SecurityContext principal and authorities.
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -35,33 +32,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader(AUTHORIZATION_HEADER);
-
         if (!StringUtils.hasText(authHeader) || !authHeader.startsWith(BEARER_PREFIX)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String jwt = authHeader.substring(BEARER_PREFIX.length());
         try {
-            if (jwtService.isTokenValid(jwt)) {
-                final String username = jwtService.extractUsername(jwt);
-                final List<GrantedAuthority> authorities = jwtService.extractAuthorities(jwt);
-
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        username,
-                        jwt,
-                        authorities
-                    );
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
-                    log.debug("Stateless authentication success for user '{}'", username);
+            final String token = authHeader.substring(BEARER_PREFIX.length());
+            if (jwtService.isTokenValid(token)
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
+                final String username = jwtService.extractUsername(token);
+                final List<GrantedAuthority> authorities = jwtService.extractAuthorities(token);
+                if (username != null) {
+                    final UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(username, token, authorities);
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         } catch (Exception ex) {
-            log.warn("JWT validation failed in qualification service: {}", ex.getMessage());
+            log.warn("JWT validation failed in admin service: {}", ex.getMessage());
         }
-
         filterChain.doFilter(request, response);
     }
 }

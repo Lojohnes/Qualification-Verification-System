@@ -27,6 +27,9 @@ nbproject/
 .env.*
 !.env.example
 
+# Generated document storage
+aqvp-qualification-service/data/
+
 # Frontend / Node.js
 node_modules/
 dist/
