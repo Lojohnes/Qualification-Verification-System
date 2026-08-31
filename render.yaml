@@ -36,7 +36,6 @@ services:
     region: oregon
     dockerfilePath: ./aqvp-identity-service/Dockerfile
     dockerContext: .
-    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
@@ -64,7 +63,6 @@ services:
     region: oregon
     dockerfilePath: ./aqvp-qualification-service/Dockerfile
     dockerContext: .
-    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
@@ -94,7 +92,6 @@ services:
     region: oregon
     dockerfilePath: ./aqvp-verification-service/Dockerfile
     dockerContext: .
-    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
@@ -126,7 +123,6 @@ services:
     region: oregon
     dockerfilePath: ./aqvp-admin-service/Dockerfile
     dockerContext: .
-    healthCheckPath: /actuator/health
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: prod
