@@ -4,9 +4,19 @@ spring:
     username: ${ADMIN_DB_USERNAME}
     password: ${ADMIN_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+  flyway:
+    schemas:
+      - admin
+    default-schema: admin
+    table: flyway_schema_history
+
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: admin
     open-in-view: false
 
 logging:
