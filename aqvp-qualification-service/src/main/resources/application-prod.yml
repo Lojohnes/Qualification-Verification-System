@@ -4,9 +4,19 @@ spring:
     username: ${QUALIFICATION_DB_USERNAME}
     password: ${QUALIFICATION_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
+
+  flyway:
+    schemas:
+      - qualification
+    default-schema: qualification
+    table: flyway_schema_history
+
   jpa:
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: qualification
     open-in-view: false
 
 logging:
