@@ -26,8 +26,6 @@ services:
         sync: false
       - key: REDIS_PORT
         sync: false
-      - key: KAFKA_BOOTSTRAP_SERVERS
-        sync: false
 
   - type: pserv
     name: aqvp-identity
@@ -53,8 +51,6 @@ services:
         sync: false
       - key: REDIS_PORT
         sync: false
-      - key: KAFKA_BOOTSTRAP_SERVERS
-        sync: false
 
   - type: pserv
     name: aqvp-qualification
@@ -79,8 +75,6 @@ services:
       - key: REDIS_HOST
         sync: false
       - key: REDIS_PORT
-        sync: false
-      - key: KAFKA_BOOTSTRAP_SERVERS
         sync: false
       - key: AQVP_SERVICES_ADMIN_BASE_URL
         value: http://aqvp-admin:10000
@@ -112,8 +106,6 @@ services:
       - key: REDIS_HOST
         sync: false
       - key: REDIS_PORT
-        sync: false
-      - key: KAFKA_BOOTSTRAP_SERVERS
         sync: false
 
   - type: pserv
@@ -159,6 +151,4 @@ services:
       - key: REDIS_HOST
         sync: false
       - key: REDIS_PORT
-        sync: false
-      - key: KAFKA_BOOTSTRAP_SERVERS
         sync: false
