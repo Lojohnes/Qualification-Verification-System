@@ -1,3 +1,8 @@
+aqvp:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-me-very-long-secret-key-at-least-256-bits}
+
 spring:
   application:
     name: admin-service
@@ -7,8 +12,6 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
 server:
-  port: 8084
+  port: ${PORT:8084}

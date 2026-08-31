@@ -1,0 +1,154 @@
+services:
+  - type: web
+    name: aqvp-gateway
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./aqvp-api-gateway/Dockerfile
+    dockerContext: .
+    healthCheckPath: /actuator/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: "10000"
+      - key: FRONTEND_ORIGIN
+        sync: false
+      - key: IDENTITY_SERVICE_URL
+        value: http://aqvp-identity:10000
+      - key: QUALIFICATION_SERVICE_URL
+        value: http://aqvp-qualification:10000
+      - key: VERIFICATION_SERVICE_URL
+        value: http://aqvp-verification:10000
+      - key: ADMIN_SERVICE_URL
+        value: http://aqvp-admin:10000
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+
+  - type: pserv
+    name: aqvp-identity
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./aqvp-identity-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: "10000"
+      - key: JWT_SECRET
+        sync: false
+      - key: IDENTITY_DB_URL
+        sync: false
+      - key: IDENTITY_DB_USERNAME
+        sync: false
+      - key: IDENTITY_DB_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+
+  - type: pserv
+    name: aqvp-qualification
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./aqvp-qualification-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: "10000"
+      - key: JWT_SECRET
+        sync: false
+      - key: QUALIFICATION_DB_URL
+        sync: false
+      - key: QUALIFICATION_DB_USERNAME
+        sync: false
+      - key: QUALIFICATION_DB_PASSWORD
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+      - key: AQVP_SERVICES_ADMIN_BASE_URL
+        value: http://aqvp-admin:10000
+
+  - type: pserv
+    name: aqvp-verification
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./aqvp-verification-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: "10000"
+      - key: JWT_SECRET
+        sync: false
+      - key: VERIFICATION_DB_URL
+        sync: false
+      - key: VERIFICATION_DB_USERNAME
+        sync: false
+      - key: VERIFICATION_DB_PASSWORD
+        sync: false
+      - key: QUALIFICATION_SERVICE_BASE_URL
+        value: http://aqvp-qualification:10000
+      - key: AQVP_SERVICES_ADMIN_BASE_URL
+        value: http://aqvp-admin:10000
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
+
+  - type: pserv
+    name: aqvp-admin
+    runtime: docker
+    plan: starter
+    region: oregon
+    dockerfilePath: ./aqvp-admin-service/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: "10000"
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_DB_URL
+        sync: false
+      - key: ADMIN_DB_USERNAME
+        sync: false
+      - key: ADMIN_DB_PASSWORD
+        sync: false
+      - key: NOTIFICATIONS_MOCK
+        value: "false"
+      - key: SPRING_MAIL_HOST
+        sync: false
+      - key: SPRING_MAIL_PORT
+        value: "587"
+      - key: SPRING_MAIL_USERNAME
+        sync: false
+      - key: SPRING_MAIL_PASSWORD
+        sync: false
+      - key: SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH
+        value: "true"
+      - key: SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE
+        value: "true"
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_FROM_NUMBER
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      - key: REDIS_PORT
+        sync: false
