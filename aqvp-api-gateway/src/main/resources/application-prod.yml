@@ -9,7 +9,7 @@ spring:
         cors-configurations:
           '[/**]':
             allowedOrigins:
-              - "${FRONTEND_ORIGIN:https://qualification-verification-system-mp64pfva9-lojohnes-projects.vercel.app}"
+              - "*"
             allowedMethods:
               - GET
               - POST
@@ -19,7 +19,7 @@ spring:
               - OPTIONS
             allowedHeaders:
               - "*"
-            allowCredentials: true
+            allowCredentials: false
 
 logging:
   level:
