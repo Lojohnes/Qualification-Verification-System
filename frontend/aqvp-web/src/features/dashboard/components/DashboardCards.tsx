@@ -6,20 +6,30 @@ import DescriptionIcon from '@mui/icons-material/Description';
 
 import { StatCard } from '@/components/ui/StatCard';
 
-export function DashboardCards() {
+interface DashboardCardsProps {
+  loading: boolean;
+  users: number;
+  qualifications: number;
+  verifications: number;
+  documents: number;
+}
+
+export function DashboardCards({ loading, users, qualifications, verifications, documents }: DashboardCardsProps) {
+  const value = (count: number) => (loading ? '—' : count.toLocaleString());
+
   return (
     <Grid container spacing={3}>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <StatCard title="Total Users" value="1,248" icon={<PeopleIcon />} color="primary" />
+        <StatCard title="Total Users" value={value(users)} icon={<PeopleIcon />} color="primary" />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <StatCard title="Qualifications" value="8,932" icon={<SchoolIcon />} color="success" />
+        <StatCard title="Qualifications" value={value(qualifications)} icon={<SchoolIcon />} color="success" />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <StatCard title="Verifications" value="12,405" icon={<VerifiedIcon />} color="info" />
+        <StatCard title="Verifications" value={value(verifications)} icon={<VerifiedIcon />} color="info" />
       </Grid>
       <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-        <StatCard title="Documents" value="24,110" icon={<DescriptionIcon />} color="warning" />
+        <StatCard title="Documents" value={value(documents)} icon={<DescriptionIcon />} color="warning" />
       </Grid>
     </Grid>
   );
