@@ -69,6 +69,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/v1/qualifications/**").hasAuthority("qualification:read")
                 .requestMatchers(HttpMethod.POST, "/api/v1/qualifications/**").hasAuthority("qualification:write")
                 .requestMatchers(HttpMethod.PUT, "/api/v1/qualifications/**").hasAuthority("qualification:write")
+                .requestMatchers(HttpMethod.POST, "/api/v1/qualifications/bulk-import/**").hasAuthority("qualification:write")
                 .anyRequest().authenticated())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
